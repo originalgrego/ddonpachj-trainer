@@ -324,17 +324,23 @@
 000964  move.w  D0, -(A5)
 000966  move.w  $101296.l, $101292.l
 000970  move.b  $1013a8.l, D2
-000976  move.w  $d00000.l, D0
+
+000976  move.w  $d00000.l, D0 ; Load player 1 input
 00097C  not.w   D0
-00097E  move.w  D0, $10128e.l
+00097E  move.w  D0, $10128e.l ; Store inverted player input
+
 000984  add.w   D0, D0
 000986  andi.w  #$700, D0
-00098A  move.w  $d00002.l, D1
+
+00098A  move.w  $d00002.l, D1 ; p2 input
 000990  not.w   D1
 000992  move.w  D1, $101290.l
+
 000998  lsl.w   #4, D1
+
 00099A  andi.w  #$3800, D1
 00099E  or.w    D1, D0
+
 0009A0  move.w  D0, $1013a8.l
 0009A6  move.w  D0, -(A7)
 0009A8  moveq   #$0, D0
@@ -349,17 +355,22 @@
 0009D2  lea     $10129c.l, A0
 0009D8  btst    #$1, $d00000.l
 0009E0  beq     $9ee
-0009E2  move.w  $d00000.l, D0
+
+0009E2  move.w  $d00000.l, D0 ; Load player 1 input
 0009E8  andi.w  #$800, D0
 0009EC  bne     $9f8
+
 0009F8  clr.w   (A0)
 0009FA  tst.w   $10129a.l
 000A00  bne     $a12
+
 000A02  btst    #$5, $1017a4.l
 000A0A  bne     $a12
+
 000A0C  jsr     $3f956.l
 000A12  cmpi.w  #$5, $1017a6.l
 000A1A  bne     $a4e
+
 000A4E  move.w  $800004.l, D0
 000A54  move.w  #$1f0, $800004.l
 000A5C  moveq   #$0, D0
@@ -367,8 +378,8 @@
 000A62  clr.w   $100f42.l
 000A68  jsr     $6c9d6.l
 000A6E  movem.l (A7)+, D0-D7/A0-A6
-000A72  addq.w  #1, $101270.l
-000A78  addq.b  #1, $101273.l
+000A72  addq.w  #1, $101270.l ; Increment frame counter
+000A78  addq.b  #1, $101273.l ; Increment byte frame counter
 000A7E  rte
 000A80  jsr     $57200.l
 000A86  jsr     $49328.l
@@ -1787,7 +1798,8 @@
 00550A  jsr     $575d0.l ; Draw text
 
 005510  addq.w  #1, D0
-005512  dbra    D4, $550a
+005512  dbra    D4, $550a ; Draw eight times
+
 005516  jsr     $573a8.l
 
 00551C  moveq   #$b, D0
@@ -2642,6 +2654,7 @@
 006340  move.l  D0, $1017e2.l
 006346  move.w  D0, $1017ea.l
 00634C  bra     $63c6
+
 0063C6  movea.l A6, A1
 0063C8  move.w  (A6), D0
 0063CA  move.w  (A0), (A1)+
@@ -2654,52 +2667,64 @@
 0063D8  move.l  ($1c,A6), D0
 0063DC  move.l  ($20,A6), D1
 0063E0  move.b  ($25,A6), D2
+
 0063E4  lea     (-$290,PC) ; ($6156), A0
 0063E8  moveq   #$c, D5
-0063EA  move.l  (A0)+, (A1)+
+0063EA  move.l  (A0)+, (A1)+ ; Initialize player data?
 0063EC  dbra    D5, $63ea
+
 0063F0  move.w  (A0)+, (A1)+
 0063F2  move.l  D0, ($1c,A6)
 0063F6  cmpi.w  #$b, $1017a6.l
 0063FE  beq     $651a
+
 006402  moveq   #$0, D0
 006404  move.w  D0, (A3)+
 006406  move.l  D0, (A3)+
-006408  move.l  D0, (A3)
+006408  move.l  D0, (A3) ; Initialize max bonus
 00640A  tst.w   D6
 00640C  beq     $641e
-00640E  move.l  D1, ($20,A6)
-006412  move.b  D2, ($24,A6)
-006416  move.b  D2, ($25,A6)
+
+00640E  move.l  D1, ($20,A6) ; Update player shot strength after death
+006412  move.b  D2, ($24,A6) ; Update player bomb count after death
+006416  move.b  D2, ($25,A6) ; Update player bomb count after death
 00641A  tst.w   D4
 00641C  bne     $644c
+
 00641E  moveq   #$0, D0
-006420  move.l  D0, ($20,A6)
+006420  move.l  D0, ($20,A6) ; Initialize player shot strength
 006424  move.w  ($1c,A6), D0
 006428  add.w   D0, D0
 00642A  add.w   D0, D0
 00642C  lea     (-$272,PC) ; ($61bc), A2
 006430  lea     (-$26a,PC) ; ($61c8), A3
+
 006434  tst.w   ($1e,A6)
 006438  beq     $6442
+
 006442  move.l  (A2,D0.w), (A4)
 006446  move.l  (A3,D0.w), ($4,A4)
+
 00644C  jsr     $58f0c.l
 006452  tst.b   $1017a5.l
 006458  bpl     $6492
+
 006492  btst    #$6, $1017a9.l
 00649A  beq     $64aa
+
 00649C  clr.w   $10e86a.l
 0064A2  move.w  #$1, $10e862.l
 0064AA  clr.w   $10e866.l
 0064B0  btst    #$0, $10e859.l
 0064B8  bne     $6504
+
 0064BA  movea.l #$704094, A0
 0064C0  move.l  #$c70030fe, D0
 0064C6  movea.l #$704088, A1
 0064CC  move.l  #$c700311f, D4
 0064D2  tst.b   ($7,A5)
 0064D6  beq     $64ec
+
 0064EC  moveq   #$2, D2
 0064EE  moveq   #$a, D3
 0064F0  jsr     $570d4.l
@@ -2710,9 +2735,11 @@
 0064FE  jsr     $570d4.l
 006504  tst.w   $10e856.l
 00650A  bne     $6546
+
 00650C  move.b  #$f0, ($3e,A6)
 006512  jsr     $573b8.l
 006518  bra     $6546
+
 00651A  move.w  ($1c,A6), D0
 00651E  add.w   D0, D0
 006520  add.w   D0, D0
@@ -3137,9 +3164,9 @@
 006FE4  moveq   #$f, D5
 006FE6  moveq   #$0, D6
 006FE8  move.l  D6, (A0)+
-006FEA  dbra    D5, $6fe8
+006FEA  dbra    D5, $6fe8 ; Update player shot count after death
 006FEE  or.w    D0, (A6)
-006FF0  movem.w D1-D3, ($1e,A6)
+006FF0  movem.w D1-D3, ($1e,A6) ; Update player shot count death
 006FF6  move.b  D4, ($25,A6)
 006FFA  move.w  #$b4, $1017be.l
 007002  clr.w   (A5)
@@ -12670,15 +12697,21 @@
 053C6C  move.w  (A6), D4
 053C6E  jmp     $53970.l
 053C74  jmp     $48754.l
+
+;
 056DC2  movem.l D1-D7/A0-A6, -(A7)
 056DC6  move.w  D0, -(A7)
 056DC8  bsr     $56dd6
+
 056DCA  move.w  (A7)+, D0
 056DCC  dbra    D0, $56dc6
 056DD0  movem.l (A7)+, D1-D7/A0-A6
 056DD4  rts
+;
+
 056DD6  move.w  #$2000, $10120e.l
 056DDE  bsr     $5a44a
+
 056DE2  move.w  #$1, $10120c.l
 056DEA  clr.w   $100f44.l
 056DF0  move    #$2000, SR
@@ -12916,10 +12949,13 @@
 057396  move.b  (A1)+, D0
 057398  beq     $573a6
 0573A6  rts
+
 0573A8  move.w  #$15, D0
 0573AC  bsr     $575d0
+
 0573B0  move.w  #$16, D0
 0573B4  bra     $575d0
+
 0573B8  movea.l #$704288, A0
 0573BE  btst    #$0, $10e859.l
 0573C6  beq     $573e2
@@ -12991,6 +13027,8 @@
 057516  bra     $574e6
 057518  movem.l (A7)+, D0-D3/A1
 05751C  rts
+
+; Draw warning text
 0575D0  movem.l D0-D3/A1, -(A7)
 0575D4  andi.w  #$ff, D0
 0575D8  lsl.w   #3, D0
@@ -13002,10 +13040,12 @@
 0575EC  adda.w  (A1)+, A0
 0575EE  subq.w  #8, A0
 0575F0  movea.l (A1), A1
+
 0575F2  clr.w   D0
 0575F4  move.b  (A1)+, D0
 0575F6  cmpi.b  #$5c, D0
 0575FA  beq     $5762e
+
 0575FC  add.w   D0, D0
 0575FE  addi.w  #$40, D0
 057602  move.l  D0, (A0)
@@ -13024,10 +13064,14 @@
 057622  move.l  D0, -(A7)
 057624  moveq   #$2, D0
 057626  bsr     $56dc2
+
 05762A  move.l  (A7)+, D0
 05762C  bra     $575f2
+
 05762E  movem.l (A7)+, D0-D3/A1
 057632  rts
+; Draw warning text
+
 057634  move.l  D0, (A0)
 057636  subq.w  #4, A0
 057638  addq.w  #2, D0
@@ -14472,6 +14516,7 @@
 05A444  move.w  (A7)+, D4
 05A446  move.w  (A7)+, D3
 05A448  rts
+
 05A44A  movea.l $101216.l, A0
 05A450  move.l  $101212.l, D4
 05A456  addi.w  #$3ff0, D4
@@ -14483,7 +14528,9 @@
 05A470  move.l  A0, D5
 05A472  cmp.l   D4, D5
 05A474  bcs     $5a464
+
 05A476  rts
+
 05A478  jsr     $44990.l
 05A47E  movem.l D0-D2/A0-A2, -(A7)
 05A482  movea.l $101216.l, A0
