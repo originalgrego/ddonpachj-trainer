@@ -7,8 +7,30 @@ invincible = $102CCA
 ; free_mem = $10AC00
 menu_index = $10AC00
 last_frame = $10AC04
+last_input = $10AC08
+
 string_pos_pointer_table_mem = $10AC10
 string_table_mem = $10AC40 ; Offset 48 bytes
+
+b_input_up = $00
+b_input_down = $01
+b_input_left = $02
+b_input_right = $03
+
+b_input_b1 = $04
+b_input_b2 = $05
+b_input_b3 = $06
+b_input_start = $07
+
+input_up = $0001
+input_down = $0002
+input_left = $0004
+input_right = $0008
+
+input_b1 = $0010
+input_b2 = $0020
+input_b3 = $0040
+input_start = $0080
 
  org  0
    incbin  "build\ddonpachj.bin"
@@ -107,12 +129,12 @@ hijack_warning_screen:
 
   bsr handle_menu_inputs
 
-.hijack_warning_loop
+.menu_wait_loop
   move.w frame_counter, D0
   cmp.w last_frame, D0
   bne .redraw_menu
 
-  bra .hijack_warning_loop
+  bra .menu_wait_loop
 
 .exit
   jmp $00554E
@@ -121,10 +143,78 @@ hijack_warning_screen:
 ;---------------------------
 handle_menu_inputs:
   ; Check inputs
+  move.w last_input, D1
+
   move.w input_p1, D0 
   not.w D0
-  tst.w D0
-  bne .exit
+  move.w D0, last_input ; Store current input as last
+
+  eor.w D0, D1 ; Fresh input
+  and.w D0, D1 ; Was a press not a release
+  
+  btst #b_input_up, D1
+  beq .input_check_down
+
+    move.b menu_index, D0
+    subi.b #$01, D0
+    bpl .menu_index_ok
+
+    moveq #$05, D0
+    
+.menu_index_ok
+    move.b D0, menu_index
+    
+    bsr update_menu_selection
+    
+    bra .input_exit
+
+.input_check_down
+  btst #b_input_down, D1
+  beq .input_check_button  
+  
+    move.b menu_index, D0
+    addi.b #$01, D0
+    cmpi.b #$06, D0
+    bne .menu_index_ok
+
+    moveq #$00, D0
+
+    bra .menu_index_ok
+
+.input_check_button
+  btst #b_input_b1, D1
+  beq .input_exit
+  
+  move.b menu_index, D0
+  cmpi.b #$05, D0
+  bne .input_exit
+
+  bra .exit
+
+.input_exit
+  rts
+;---------------------------
+
+;---------------------------
+update_menu_selection:
+  moveq #$0, D1
+  moveq #$5, D0
+  move.b #$C4, D2
+  movea.l #string_pos_pointer_table_mem, A0
+
+.update_selection_loop
+  move.w D0, D1
+  rol #$3, D1
+  move.b D2, (A0, D1.w)
+
+  dbra D0, .update_selection_loop
+
+  move.b #$C0, D2
+
+  moveq #$0, D1
+  move.b menu_index, D1
+  rol #$3, D1
+  move.b D2, (A0, D1.w)
 
   rts
 ;---------------------------
