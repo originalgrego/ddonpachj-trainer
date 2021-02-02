@@ -5,7 +5,8 @@ second_loop = $10197A
 invincible = $102CCA
 
 ; free_mem = $10AC00
-menu_index = $10AC00;
+menu_index = $10AC00
+last_frame = $10AC04
 string_pos_pointer_table_mem = $10AC10
 string_table_mem = $10AC40 ; Offset 48 bytes
 
@@ -50,6 +51,9 @@ string_table_mem = $10AC40 ; Offset 48 bytes
  org $057626
    nop
    nop
+   
+ org $575d0
+   rts
 ;---------------------------------- 
 
  org $000af2
@@ -85,29 +89,65 @@ string_table_mem = $10AC40 ; Offset 48 bytes
 
 ;---------------------------
 hijack_warning_screen:
-  
   moveq #$30, D0
   movea.l #string_pos_pointer_table_mem, A0
   movea.l #string_pos_pointer_table, A1
-
   bsr copy_mem
 
   moveq #$60, D0
   movea.l #string_table_mem, A0
   movea.l #string_table, A1
-  
   bsr copy_mem
 
+.redraw_menu
+  move.w frame_counter, D0
+  move.w D0, last_frame ; Store last frame count
+
+  bsr draw_menu
+
+  bsr handle_menu_inputs
+
 .hijack_warning_loop
-  move.w input_p1, D0 
-  not.w D0
-  tst.w D0
-  bne .exit
+  move.w frame_counter, D0
+  cmp.w last_frame, D0
+  bne .redraw_menu
 
   bra .hijack_warning_loop
 
 .exit
   jmp $00554E
+;---------------------------
+
+;---------------------------
+handle_menu_inputs:
+  ; Check inputs
+  move.w input_p1, D0 
+  not.w D0
+  tst.w D0
+  bne .exit
+
+  rts
+;---------------------------
+
+;---------------------------
+draw_menu:
+  moveq #$5, D0
+
+.draw_text_loop
+  bsr draw_text
+  dbra D0, .draw_text_loop
+
+  rts
+;---------------------------
+
+;---------------------------
+draw_text:
+  movem.l D0-D3/A1, -(A7)
+  andi.w  #$ff, D0
+  lsl.w   #3, D0 ; Get offset into location/pointer table
+  movea.l #string_pos_pointer_table_mem, A1 ; Vram location data/string pointer
+
+  jmp $0575E0
 ;---------------------------
 
 ;---------------------------
@@ -145,6 +185,9 @@ copy_mem:
 
 nibble_to_char:
   dc.b "0123456789ABCDEF"
+
+max_value_table:
+ dc.b $06, $01, $04, $06, $0F, $00
 
 ; Each entry 8 bytes
 string_pos_pointer_table:
