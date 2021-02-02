@@ -12,6 +12,16 @@ last_input = $10AC08
 string_pos_pointer_table_mem = $10AC10
 string_table_mem = $10AC40 ; Offset 48 bytes
 
+; Menu selection variables, each is one byte long
+menu_sel_vars_start = $10ACA0 ; Offset 96 bytes
+level_sel = $10ACA0
+loop_sel = $10ACA1
+shot_sel = $10ACA2
+bomb_sel = $10ACA3
+bonus_sel = $10ACA4
+
+string_table_value_offset = $0C
+
 b_input_up = $00
 b_input_down = $01
 b_input_left = $02
@@ -121,6 +131,11 @@ hijack_warning_screen:
   movea.l #string_table, A1
   bsr copy_mem
 
+  moveq #$05, D0
+  movea.l #menu_sel_vars_start, A0
+  movea.l #default_value_table, A1
+  bsr copy_mem
+
 .redraw_menu
   move.w frame_counter, D0
   move.w D0, last_frame ; Store last frame count
@@ -170,7 +185,7 @@ handle_menu_inputs:
 
 .input_check_down
   btst #b_input_down, D1
-  beq .input_check_button  
+  beq .input_check_left  
   
     move.b menu_index, D0
     addi.b #$01, D0
@@ -180,6 +195,48 @@ handle_menu_inputs:
     moveq #$00, D0
 
     bra .menu_index_ok
+
+.input_check_left
+  btst #b_input_left, D1
+  beq .input_check_right
+  
+    moveq #$00, D0
+    move.b menu_index, D0
+    movea.l #menu_sel_vars_start, A0
+    movea.l #max_value_table, A1
+    moveq #$00, D1
+    move.b (A0, D0), D1 ; Get selection
+    subi.b #$01, D1
+    bpl .selected_value_ok
+
+    move.b (A1, D0), D1 ; Load max value
+   
+.selected_value_ok
+    move.b D1, (A0, D0)
+    
+    bra .input_exit    
+
+.input_check_right
+  btst #b_input_right, D1
+  beq .input_check_button
+
+    moveq #$00, D0
+    move.b menu_index, D0
+    movea.l #menu_sel_vars_start, A0
+    movea.l #max_value_table, A1
+    
+    moveq #$00, D2
+    move.b (A1, D0), D2 ; Get max value
+    
+    moveq #$00, D1
+    move.b (A0, D0), D1 ; Get selection
+    addi.b #$01, D1
+    cmp.b D1, D2
+    bge .selected_value_ok
+
+    moveq #$00, D1
+
+    bra .selected_value_ok
 
 .input_check_button
   btst #b_input_b1, D1
@@ -279,7 +336,14 @@ nibble_to_char:
 max_value_table:
  dc.b $06, $01, $04, $06, $0F, $00
 
+default_value_table:
+ dc.b $00, $00, $04, $06, $0F, $00
+
 ; Each entry 8 bytes
+; Layout: CC CC PP PP AA AA AA AA
+; C - Tile config/properties
+; P - Vram position
+; A - String address
 string_pos_pointer_table:
 level_pos_pointer:
   dc.b $C0, $00, $02, $88, $00, $10, $AC, $40
