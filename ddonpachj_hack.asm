@@ -4,22 +4,18 @@ level = $101978
 second_loop = $10197A
 invincible = $102CCA
 
+; free_mem = $10AC00
+menu_index = $10AC00;
+string_pos_pointer_table_mem = $10AC10
+string_table_mem = $10AC40 ; Offset 48 bytes
+
  org  0
    incbin  "build\ddonpachj.bin"
 
  ; Skip crc
  org $005410
   bra $00541E
-	
- ; Skip warning
- org $0054EC
- ; bra $00554e
-  
- ; Do not delay drawing text on warning screen
- org $057626
-;   nop
-;   nop
-  
+	  
  ; Enable pause/level scroll
  org $000b02
 ;  nop
@@ -41,11 +37,20 @@ invincible = $102CCA
   dc.b $00, $01
 ; Player never lose invi
 ;---------------------------------- 
- 
 
-
+;---------------------------------- 
  org $00552E
-;  jmp hijack_warning_screen
+  jmp hijack_warning_screen
+
+ ; Skip warning
+ org $0054EC
+ ; bra $00554e
+  
+ ; Do not delay drawing text on warning screen
+ org $057626
+   nop
+   nop
+;---------------------------------- 
 
  org $000af2
 ;  dc.b $00, $00, $0b, $68
@@ -78,16 +83,32 @@ invincible = $102CCA
 ;============================
  org $098000
 
+;---------------------------
 hijack_warning_screen:
+  
+  moveq #$30, D0
+  movea.l #string_pos_pointer_table_mem, A0
+  movea.l #string_pos_pointer_table, A1
+
+  bsr copy_mem
+
+  moveq #$60, D0
+  movea.l #string_table_mem, A0
+  movea.l #string_table, A1
+  
+  bsr copy_mem
+
+.hijack_warning_loop
   move.w input_p1, D0 
   not.w D0
   tst.w D0
   bne .exit
 
-  bra hijack_warning_screen
+  bra .hijack_warning_loop
 
 .exit
   jmp $00554E
+;---------------------------
 
 ;---------------------------
 hijack_initialize_player_shot:
@@ -113,3 +134,44 @@ hijack_initialize_player:
   
   jmp $0063F0
 ;---------------------------
+
+;-----------------
+copy_mem:
+  move.b  (A1, D0.w), D1
+  move.b  D1, (A0, D0.w)
+  dbra D0, copy_mem
+  rts
+;-----------------
+
+nibble_to_char:
+  dc.b "0123456789ABCDEF"
+
+; Each entry 8 bytes
+string_pos_pointer_table:
+level_pos_pointer:
+  dc.b $C0, $00, $02, $88, $00, $10, $AC, $40
+loop_pos_pointer:
+  dc.b $C4, $00, $02, $80, $00, $10, $AC, $50
+shot_pos_pointer:
+  dc.b $C4, $00, $02, $78, $00, $10, $AC, $60
+bomb_pos_pointer:
+  dc.b $C4, $00, $02, $70, $00, $10, $AC, $70
+bonus_pos_pointer:
+  dc.b $C4, $00, $02, $68, $00, $10, $AC, $80
+exit_pos_pointer:
+  dc.b $C4, $00, $02, $60, $00, $10, $AC, $90
+
+; Each entry is 16 bytes long
+string_table:
+level_string:
+  dc.b "      LEVEL 0 \\\\"
+loop_string:
+  dc.b "       LOOP 0 \\\\"
+shot_string:
+  dc.b "       SHOT 4 \\\\"
+bomb_string:
+  dc.b "       BOMB 6 \\\\"
+bonus_string:
+  dc.b "      BONUS 15\\\\"  
+exit_string:
+  dc.b "       EXIT   \\\\"  
