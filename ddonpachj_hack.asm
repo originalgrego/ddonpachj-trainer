@@ -214,6 +214,8 @@ handle_menu_inputs:
 .selected_value_ok
     move.b D1, (A0, D0)
     
+    bsr update_menu_value
+    
     bra .input_exit    
 
 .input_check_right
@@ -249,6 +251,30 @@ handle_menu_inputs:
   bra .exit
 
 .input_exit
+  rts
+;---------------------------
+
+;---------------------------
+;string_table_value_offset
+
+update_menu_value:
+    moveq #$00, D0
+    move.b menu_index, D0
+
+    moveq #string_table_value_offset, D2    
+    movea.l #menu_sel_vars_start, A0
+    movea.l #nibble_to_char, A1
+    movea.l #string_table_mem, A2
+    
+    moveq #$00, D1
+    move.b (A0, D0), D1 ; Get selection
+    
+    rol #$4, D0 ; Get item offset into string_table_mem
+    add.w D2, D0 ; Offset to value
+    
+    move.b (A1, D1), D1 ; Load char
+    move.b D1, (A2, D0)
+    
   rts
 ;---------------------------
 
