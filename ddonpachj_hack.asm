@@ -1,5 +1,8 @@
 input_p1 = $d00000
 frame_counter = $101270
+level = $101978
+second_loop = $10197A
+invincible = $102CCA
 
  org  0
    incbin  "build\ddonpachj.bin"
@@ -14,16 +17,35 @@ frame_counter = $101270
   
  ; Do not delay drawing text on warning screen
  org $057626
-   nop
-   nop
+;   nop
+;   nop
   
  ; Enable pause/level scroll
  org $000b02
+;  nop
+;  nop
+
+;---------------------------------- 
+; Player never lose invi
+ org $006642
   nop
   nop
 
+ org $000D8C
+  nop
+  nop
+  nop
+
+ ; End of level do not set invi to FF
+ org $00668e
+  dc.b $00, $01
+; Player never lose invi
+;---------------------------------- 
+ 
+
+
  org $00552E
-  jmp hijack_warning_screen
+;  jmp hijack_warning_screen
 
  org $000af2
 ;  dc.b $00, $00, $0b, $68
@@ -42,14 +64,14 @@ frame_counter = $101270
  
  
  org $0063E8
-  jmp hijack_initialize_player
+;  jmp hijack_initialize_player
 
  org $00641E
-  jmp hijack_initialize_player_shot
+;  jmp hijack_initialize_player_shot
   
   
  org $06b7cf
-  incbin  "config_text.bin"
+;  incbin  "config_text.bin"
 
 ;============================
 ; Free space
@@ -72,6 +94,7 @@ hijack_initialize_player_shot:
   moveq #$04, D0
   move.b D0, $102CAD
   move.b D0, $102CAF
+  move.b D0, invincible ; Make invincible
   
   jmp $006424
 ;---------------------------
