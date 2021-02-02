@@ -716,13 +716,18 @@
 002CC2  jsr     $57676.l
 002CC8  move.w  #$20, ($1c,A5)
 002CCE  move.w  #$20, ($20,A5)
+
 002CD4  cmpi.w  #$1, $101978.l
 002CDC  beq     $2cf8
+
 002CDE  cmpi.w  #$3, $101978.l
 002CE6  beq     $2cf8
+
 002CE8  cmpi.w  #$4, $101978.l
 002CF0  beq     $2cf8
+
 002CF2  addi.w  #$20, ($20,A5)
+
 002CF8  move.w  #$0, ($24,A5)
 002CFE  bclr    #$6, ($3,A5)
 002D04  lea     $101976.l, A6
@@ -1816,6 +1821,7 @@
 
 005548  jsr     $48abc.l
 00554E  jmp     $a80.l
+
 005554  move.w  #$f000, D0
 005558  dbra    D0, $5558
 00555C  lea     $10129e.l, A0
@@ -2804,8 +2810,10 @@
 006636  bclr    #$4, (A6)
 00663A  cmpi.b  #-$1, ($3e,A6)
 006640  beq     $6650
-006642  subq.b  #1, ($3e,A6)
+
+006642  subq.b  #1, ($3e,A6) ; Decrement invincibility counter
 006646  bra     $6650
+
 006648  bclr    #$4, (A6)
 00664C  bne     $6dd8
 006650  tst.b   ($7,A5)
