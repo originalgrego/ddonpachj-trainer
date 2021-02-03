@@ -17380,12 +17380,16 @@
 01FA00  dbra    D2, $1f9da
 01FA04  movem.l (A7)+, D0-D6/A0
 01FA08  rts
+
+; End level!
 01FA40  bset    #$5, $102c8c.l
 01FA48  bset    #$5, $102ccc.l
 01FA50  bset    #$3, $10e858.l
 01FA58  bset    #$0, $1017a4.l
 01FA60  move.w  #$1, $10e862.l
 01FA68  rts
+; End level!
+
 01FA6A  cmpi.w  #$1, D0
 01FA6E  bne     $1fa98
 01FA70  move.l  #$10b80, D0
@@ -27741,6 +27745,7 @@
 031308  beq     $3131c
 03130A  subq.w  #1, ($27a,A6)
 03130E  bne     $3131c
+
 031310  jsr     $1fa40.l
 031316  jmp     $48754.l
 03131C  lea     ($25c,A6), A0
@@ -28183,7 +28188,8 @@
 031C10  jsr     $35eb2.l
 031C16  subq.w  #1, ($1c,A5)
 031C1A  bne     $31c26
-031C1C  move.w  #$60, ($1e,A5)
+
+031C1C  move.w  #$60, ($1e,A5) ; Load final count down to end boss battle
 031C22  bsr     $3378a
 031C26  lea     ($20,A4), A6
 031C2A  moveq   #$a, D7
@@ -28193,9 +28199,13 @@
 031C3A  rts
 031C3C  tst.w   $100f88.l
 031C42  bne     $3378a
-031C46  subq.w  #1, ($1e,A5)
+
+031C46  subq.w  #1, ($1e,A5) ; Decrement final boss count down
 031C4A  bcs     $31c4e
+
 031C4C  rts
+
+; Boss 1 final count down complete
 031C4E  jsr     $1fa40.l
 031C54  jmp     $48754.l
 031C5A  tst.w   $101764.l
@@ -28328,14 +28338,18 @@
 031EAE  move.w  D7, ($58,A6)
 031EB2  move.w  D7, ($f8,A6)
 031EB6  move.w  D7, ($118,A6)
-031EBA  sub.l   D5, ($16,A5)
+031EBA  sub.l   D5, ($16,A5) ; Update boss health
 031EBE  move.l  ($16,A5), $10183a.l
 031EC6  bpl     $32022
+
+; Boss 1 dead!
 031ECA  jsr     $5a2f2.l
 031ED0  tst.w   D0
 031ED2  bne     $31ef0
+
 031EF0  tst.w   ($1a,A5)
 031EF4  bne     $31f0a
+
 031F0A  move.l  #$30000, $10182a.l
 031F14  ori.b   #$c0, $10e858.l
 031F1C  jsr     $5a36e.l
@@ -28381,6 +28395,7 @@
 031FF4  lea     ($15e4,PC) ; ($335da), A0
 031FF8  jsr     $48b70.l
 031FFE  bra     $318c0
+
 032002  moveq   #$22, D0
 032004  moveq   #$2f, D2
 032006  moveq   #$21, D3
@@ -29921,9 +29936,12 @@
 034256  sub.l   D5, ($16,A5)
 03425A  move.l  ($16,A5), $10183a.l
 034262  bpl     $34430
+
+; Boss dead
 034266  jsr     $5a2f2.l
 03426C  tst.w   D0
 03426E  bne     $3428c
+
 03428C  tst.w   ($1a,A5)
 034290  bne     $342a6
 0342A6  move.l  #$40000, $10182a.l
@@ -41029,6 +41047,8 @@
 048748  lea     $15712.l, A0
 04874E  movea.l ($4,A0,D0.w), A1
 048752  jmp     (A1)
+
+; Score related?
 048754  movea.l ($6,A5), A6
 048758  moveq   #$1, D0
 04875A  moveq   #$0, D1
@@ -41038,6 +41058,8 @@
 048766  dbra    D1, $48760
 04876A  clr.w   (A5)
 04876C  rts
+; Score related?
+
 04876E  moveq   #$71, D0
 048770  moveq   #$0, D1
 048772  lea     $104af6.l, A0
@@ -49824,15 +49846,22 @@
 05A2E0  move.b  $102ccc.l, D1
 05A2E6  bpl     $5a2f0
 05A2F0  rts
+
+;
 05A2F2  moveq   #$0, D0
 05A2F4  tst.w   $102c8c.l
 05A2FA  bpl     $5a308
+
 05A2FC  btst    #$0, $102c8c.l
 05A304  bne     $5a308
+
 05A306  moveq   #$10, D0
 05A308  tst.w   $102ccc.l
 05A30E  bpl     $5a31c
+
 05A31C  rts
+;
+
 05A31E  moveq   #-$1, D0
 05A320  tst.w   $102c8c.l
 05A326  bpl     $5a33e

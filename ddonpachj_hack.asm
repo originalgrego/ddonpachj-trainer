@@ -51,8 +51,8 @@ input_start = $0080
 	  
  ; Enable pause/level scroll
  org $000b02
-;  nop
-;  nop
+  nop
+  nop
 
 ;---------------------------------- 
 ; Player never lose invi
@@ -105,7 +105,7 @@ input_start = $0080
  
  
  org $0063E8
-;  jmp hijack_initialize_player
+  jmp hijack_initialize_player
 
  org $00641E
 ;  jmp hijack_initialize_player_shot
@@ -335,6 +335,8 @@ hijack_initialize_player_shot:
 
 ;---------------------------
 hijack_initialize_player:
+  jsr     $1fa40.l
+
   moveq   #$c, D5
 
 .loop
