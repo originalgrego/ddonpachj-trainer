@@ -1589,9 +1589,11 @@
 002DFA  move.l  A0, (A1)+
 002DFC  dbra    D2, $2dea
 002E00  moveq   #$4, D0
-002E02  jsr     $57da8.l
+002E02  jsr     $57da8.l 
+
 002E08  moveq   #$38, D0
-002E0A  jsr     $57da8.l
+002E0A  jsr     $57da8.l ; Start game?
+
 002E10  move.w  #$1e00, $10e874.l
 002E18  tst.w   $101978.l
 002E1E  bne     $2e3c
@@ -40220,9 +40222,11 @@
 047142  beq     $47190
 047190  btst    #$1, ($70,A6)
 047196  beq     $471e0
-0471E0  move.w  $104af0.l, D0
-0471E6  andi.w  #$70, D0
+
+0471E0  move.w  $104af0.l, D0 ; Read player input
+0471E6  andi.w  #$70, D0 ; Check if start/b1/b2 pressed
 0471EA  beq     $47220
+
 0471EC  move.b  #$20, ($72,A6)
 0471F2  move.b  #$0, ($73,A6)
 0471F8  andi.b  #$fd, $102cc9.l
@@ -40231,6 +40235,7 @@
 04720E  bset    #$7, $102cc9.l
 047216  move.w  #$8, D0
 04721A  jsr     $6d49c.l
+
 047220  move.w  #$7753, D2
 047224  move.w  #$30, D1
 047228  move.w  #$a00, D3
@@ -40544,9 +40549,13 @@
 047796  beq     $477d0
 0477D0  btst    #$3, ($70,A6)
 0477D6  beq     $47810
-047810  move.w  $104af0.l, D0
-047816  andi.w  #$70, D0
+
+; Char select handle weapon type
+047810  move.w  $104af0.l, D0 ; Read player input
+047816  andi.w  #$70, D0 ; Check start/b1/b2
 04781A  beq     $4784a
+
+; Player selected weapon type
 04781C  move.b  #$20, ($72,A6)
 047822  move.b  #$0, ($73,A6)
 047828  andi.b  #$fb, $102cc9.l
@@ -40554,7 +40563,8 @@
 047836  subq.w  #1, ($56,A6)
 04783A  ori.b   #$40, ($a1,A6)
 047840  move.w  #$8, D0
-047844  jsr     $6d49c.l
+047844  jsr     $6d49c.l ; End character select
+
 04784A  move.w  #$7787, D2
 04784E  move.w  #$30, D1
 047852  move.w  #$a00, D3
@@ -40564,11 +40574,14 @@
 047862  move.w  #$504, D5
 047866  jsr     $5a424.l
 04786C  move.w  #$76a5, D2
-047870  move.w  $104af0.l, D0
-047876  btst    #$a, D0
+
+047870  move.w  $104af0.l, D0 ; Read player input
+047876  btst    #$a, D0 ;
 04787A  beq     $47882
-047882  btst    #$b, D0
+
+047882  btst    #$b, D0 ; 
 047886  beq     $4788c
+
 04788C  move.w  #$30, D1
 047890  move.w  #$b80, D3
 047894  move.w  #$780, D4
@@ -40974,8 +40987,10 @@
 048654  bne     $48626
 048656  tst.b   $1017a5.l
 04865C  bpl     $48668
-048668  jsr     $57dae.l
+
+048668  jsr     $57dae.l ; Really start the stage?
 04866E  bra     $48626
+
 048670  move.l  A6, ($4,A5)
 048674  rts
 048676  move.w  D0, D1
@@ -47745,17 +47760,22 @@
 056E24  andi.w  #$1800, D0
 056E28  bne     $56e68
 056E2A  rts
+
+;
 056EE4  lea     $104aed.l, A0
 056EEA  lea     $10128f.l, A4
 056EF0  lea     $101260.l, A2
 056EF6  lea     $101268.l, A3
 056EFC  bra     $56f16
+
 056EFE  lea     $104aef.l, A0
 056F04  lea     $101291.l, A4
 056F0A  lea     $101264.l, A2
 056F10  lea     $10126a.l, A3
+
 056F16  tst.b   $1017a5.l
 056F1C  bmi     $56f32
+
 056F20  move.b  -(A0), D0
 056F22  andi.w  #$ff, D0
 056F26  not.w   D0
@@ -47764,37 +47784,47 @@
 056F2C  and.b   D1, D0
 056F2E  move.b  D0, (A0)
 056F30  rts
+;
+
+; Select character menu
 056FA6  lea     $104aed.l, A0
-056FAC  lea     $10128f.l, A4
-056FB2  cmpa.l  #$102c8c, A6
+056FAC  lea     $10128f.l, A4 ; Player input
+056FB2  cmpa.l  #$102c8c, A6 ; Check player
 056FB8  beq     $56fc2
-056FC2  move.b  -(A0), D0
+
+056FC2  move.b  -(A0), D0 ; Read last input
 056FC4  andi.w  #$ff, D0
 056FC8  not.w   D0
-056FCA  move.b  (A4), D1
+
+056FCA  move.b  (A4), D1 ; Read inputs 
 056FCC  andi.w  #$3, D1
 056FD0  bset    #$3, D1
+
 056FD4  move.b  D1, (A0)+
 056FD6  and.b   D1, D0
 056FD8  andi.w  #$f, D0
 056FDC  moveq   #$3, D1
 056FDE  and.w   $10126e.l, D1
 056FE4  bne     $56fea
+
 056FE6  bset    #$4, D0
 056FEA  move.b  D0, (A0)
 056FEC  move.w  $10126e.l, D1
 056FF2  andi.w  #$100, D1
 056FF6  bne     $57008
+
 056FF8  bclr    #$3, (-$1,A0)
 056FFE  ori.b   #$14, (-$1,A0)
 057004  bclr    #$4, (A0)
 057008  rts
-05700A  lea     $104af1.l, A0
-057010  lea     $10128f.l, A4
+
+;
+05700A  lea     $104af1.l, A0 ; Old player input
+057010  lea     $10128f.l, A4 ; Player input lower byte
 057016  move.b  -(A0), D0
 057018  andi.w  #$ff, D0
 05701C  not.w   D0
-05701E  move.b  (A4), D1
+05701E  move.b  (A4), D1 ; Load player input
 057020  move.b  D1, (A0)+
 057022  and.b   D1, D0
 057024  move.b  D0, (A0)+
@@ -47806,6 +47836,8 @@
 057034  and.b   D1, D0
 057036  move.b  D0, (A0)
 057038  rts
+;
+
 05703A  move.l  A0, D4
 05703C  move.w  D2, D5
 05703E  addq.w  #1, D0
@@ -48244,9 +48276,12 @@
 057D5C  and.w   $101272.l, D0
 057D62  move.b  ($4,PC,D0.w), D0
 057D66  rts
+
+; Change game state?
 057DA8  moveq   #$0, D1
 057DAA  moveq   #$0, D2
 057DAC  moveq   #$0, D3
+
 057DAE  move.w  D0, D4
 057DB0  lsl.w   #3, D4
 057DB2  lea     $43a.l, A0
@@ -48258,11 +48293,14 @@
 057DCA  move.w  D0, D4
 057DCC  tst.w   (A0)
 057DCE  bpl     $57de0
+
 057DD0  addq.w  #1, D4
 057DD2  lea     ($40,A0), A0
 057DD6  dbra    D5, $57dcc
 057DDA  ori     #$1, SR
 057DDE  rts
+
+;
 057DE0  ori.w   #$8000, D4
 057DE4  move.w  D4, (A0)+
 057DE6  clr.w   (A0)+
@@ -48270,6 +48308,8 @@
 057DEA  move.l  D2, (A0)+
 057DEC  move.l  D3, (A0)+
 057DEE  rts
+; Change game state?
+
 057DF0  bsr     $57dae
 057DF2  bcs     $57e0e
 057DF4  lea     $10e7e0.l, A1
@@ -50504,25 +50544,34 @@
 06D496  clr.w   (A1)
 06D498  movea.l (A7)+, A1
 06D49A  rts
+
+; End char select
 06D49C  movem.l D1-D2/A0-A2, -(A7)
 06D4A0  btst    #$7, $1017a5.l
 06D4A8  beq     $6d4ba
+
 06D4AA  btst    #$3, $101297.l
 06D4B2  beq     $6d4ba
+
 06D4BA  lea     $6d4ea.l, A1
 06D4C0  movea.l (A1,D0.w), A1
 06D4C4  lea     $1013f8.l, A0
 06D4CA  moveq   #$1d, D1
 06D4CC  tst.w   (A0)
 06D4CE  bmi     $6d4de
+
 06D4D0  move.w  #$8000, (A0)
 06D4D4  move.w  (A1)+, ($2,A0)
 06D4D8  move.l  A1, ($4,A0)
 06D4DC  bra     $6d4e4
+
 06D4DE  addq.w  #8, A0
 06D4E0  dbra    D1, $6d4cc
+
 06D4E4  movem.l (A7)+, D1-D2/A0-A2
 06D4E8  rts
+; End char select
+
 06DB66  lea     $1054f6.l, A6
 06DB6C  btst    #$7, ($1,A6)
 06DB72  beq     $6db86

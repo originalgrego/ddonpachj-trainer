@@ -20,6 +20,9 @@ shot_sel = $10ACA2
 bomb_sel = $10ACA3
 bonus_sel = $10ACA4
 
+skipped_to_stage = $10f900
+stage_skip_count = $10f904
+
 string_table_value_offset = $0C
 
 b_input_up = $00
@@ -53,6 +56,11 @@ input_start = $0080
  org $000b02
   nop
   nop
+
+
+ ; Level end test
+ org $048668
+   jmp hijack_game_start
 
 ;---------------------------------- 
 ; Player never lose invi
@@ -118,6 +126,29 @@ input_start = $0080
 ; Free space
 ;============================
  org $098000
+  
+;---------------------------
+hijack_game_start:
+  move.b skipped_to_stage, D5
+  bne .game_start_exit
+  
+  move.b stage_skip_count, D5
+  cmpi.b #$4, D5
+  beq .do_skip
+  
+  addi.b #$01, D5
+  move.b D5, stage_skip_count
+  bra .game_start_exit
+  
+.do_skip
+  move.b #$01, D5
+  move.b D5, skipped_to_stage
+  jsr $1fa40.l ; End level
+  
+.game_start_exit
+  jsr $57dae.l
+  jmp $48626
+;---------------------------
 
 ;---------------------------
 hijack_warning_screen:
@@ -335,7 +366,7 @@ hijack_initialize_player_shot:
 
 ;---------------------------
 hijack_initialize_player:
-  jsr     $1fa40.l
+;  jsr     $1fa40.l ; End level
 
   moveq   #$c, D5
 
@@ -343,7 +374,7 @@ hijack_initialize_player:
   move.l  (A0)+, (A1)+ ; Initialize player data?
   dbra    D5, .loop
   
-  moveq #$06, D5
+  moveq #$05, D5
   move.b D5, $102CB0 ; Bombs
   move.b D5, $102CB1
   
