@@ -7,6 +7,8 @@ shot_power = $102CAD
 laser_power = $102CAF
 bomb_count = $102CB0
 bomb_max = $102CB1
+rank = $101968
+survival_time = $101970
 
 ; free_mem = $10AC00
 menu_index = $10AC00
@@ -52,6 +54,8 @@ input_b1 = $0010
 input_b2 = $0020
 input_b3 = $0040
 input_start = $0080
+
+full_rank_surv_time = $0001F800
 
  org  0
    incbin  "build\ddonpachj.bin"
@@ -430,6 +434,13 @@ hijack_initialize_player:
   move.b loop_sel, D5
   move.w D5, second_loop
 
+  move.b rank_sel, D5
+  beq .rank_not_selected
+
+  move.l #full_rank_surv_time, D5
+  move.l D5, survival_time
+
+.rank_not_selected
   move.b bomb_sel, D5
   move.b D5, bomb_count
 
