@@ -3,6 +3,10 @@ frame_counter = $101270
 level = $101978
 second_loop = $10197A
 invincible = $102CCA
+shot_power = $102CAD
+laser_power = $102CAF
+bomb_count = $102CB0
+bomb_max = $102CB1
 
 ; free_mem = $10AC00
 menu_index = $10AC00
@@ -60,7 +64,7 @@ input_start = $0080
 
  ; Level end test
  org $048668
-   jmp hijack_game_start
+;   jmp hijack_game_start
 
 ;---------------------------------- 
 ; Player never lose invi
@@ -370,9 +374,11 @@ draw_text:
 
 ;---------------------------
 hijack_initialize_player_shot:
-  moveq #$04, D0
-  move.b D0, $102CAD
-  move.b D0, $102CAF
+  moveq #$00, D0
+  move.b shot_sel, D0
+  move.b D0, shot_power
+  move.b D0, laser_power
+
   move.b D0, invincible ; Make invincible
   
   jmp $006424
@@ -388,9 +394,16 @@ hijack_initialize_player:
   move.l  (A0)+, (A1)+ ; Initialize player data?
   dbra    D5, .loop
   
-  moveq #$05, D5
-  move.b D5, $102CB0 ; Bombs
-  move.b D5, $102CB1
+  moveq #$00, D5
+  move.b bomb_sel, D5
+  move.b D5, bomb_count
+  cmpi.b #$03, D5
+  bge .init_player_continue
+
+  move.b #$03, D5
+
+.init_player_continue  
+  move.b D5, bomb_max
   
   jmp $0063F0
 ;---------------------------
