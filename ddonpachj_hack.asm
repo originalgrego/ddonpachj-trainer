@@ -35,6 +35,8 @@ rank_sel = $10F9A6
 skipped_to_stage = $10f900
 stage_skip_count = $10f904
 player_clicked_in = $10f908
+maximum_applied = $10f90c
+game_start_handled = $10f910
 
 string_table_value_offset = $0C
 
@@ -81,17 +83,17 @@ full_rank_surv_time = $0001F800
 ;---------------------------------- 
 ; Player never lose invi
  org $006642
-  nop
-  nop
+;  nop
+;  nop
 
  org $000D8C
-  nop
-  nop
-  nop
+;  nop
+;  nop
+;  nop
 
  ; End of level do not set invi to FF
  org $00668e
-  dc.b $00, $01
+;  dc.b $00, $01
 ; Player never lose invi
 ;---------------------------------- 
 
@@ -111,22 +113,6 @@ full_rank_surv_time = $0001F800
  org $575d0
    rts
 ;---------------------------------- 
-
- org $000af2
-;  dc.b $00, $00, $0b, $68
-  
- org $000b68
-;  dc.b $4e, $b9, $00, $04, $9b, $ec, $4e, $b9
-
- org $000b70
-;  dc.b $00, $05, $6d, $d6
-
- org $000b74
-;  dc.b $4e, $75
-
- org $049c0c
-;  dc.b $00, $10, $f9, $00
- 
  
  org $0063E8
   jmp hijack_initialize_player
@@ -172,32 +158,52 @@ kill_big_bee:
 
 ;---------------------------
 hijack_game_start:
-  move.b skipped_to_stage, D5
+  move.b game_start_handled, D5
   bne .game_start_exit
   
   move.b player_clicked_in, D5
   beq .game_start_exit
   
   move.b stage_skip_count, D5
+  cmpi.b #$02, D5
+  bne .check_skip
+
+    tst.b maximum_applied
+    bne .check_skip
+
+      move.b #$01, maximum_applied
+      jsr $59090 ; Call maximum prep method
+
+.check_skip
   cmpi.b #$4, D5
   beq .do_skip
-  
+
+.increment_start_count
   addi.b #$01, D5
   move.b D5, stage_skip_count
-  bra .game_start_exit
+  bra .game_start_check_handled
     
 .do_skip
-  jsr $59090 ; Maximum test
- 
-  move.b #$01, D5
-  move.b D5, skipped_to_stage
-  
-  moveq #$0, D5
-  move.b level_sel, D5
-  move.w D5, level
-  
-  jsr $1fa40.l ; End level
-  
+  tst.b skipped_to_stage
+  bne .game_start_check_handled
+
+    move.b #$01, skipped_to_stage
+    
+    moveq #$0, D5
+    move.b level_sel, D5
+    move.w D5, level
+    
+    jsr $1fa40.l ; End level
+
+.game_start_check_handled
+  tst.b skipped_to_stage
+  beq .game_start_exit
+
+  tst.b maximum_applied
+  beq .game_start_exit
+
+  move.b #$01, game_start_handled
+
 .game_start_exit
   jsr $57dae.l
   jmp $48626
@@ -251,12 +257,17 @@ prep_menu_results:
 
   sub.b #$01, D0
   move.b D0, level_sel
-  bra .menu_results_exit
+  bra .menu_results_check_maximum
 
 .menu_results_dont_skip
-  move.b #$01, D1
-  move.b D1, skipped_to_stage
+  move.b #$01, skipped_to_stage
   
+.menu_results_check_maximum
+  tst.b bonus_sel
+  bne .menu_results_exit
+  
+  move.b #$01, maximum_applied
+
 .menu_results_exit
   rts
 ;---------------------------
@@ -434,8 +445,8 @@ hijack_initialize_player_shot:
   move.b player_clicked_in, D0
   beq .init_p_shot_continue  
 
-  moveq #$01, D0
-  move.b D0, invincible ; Make invincible
+;  moveq #$01, D0
+;  move.b D0, invincible ; Make invincible
 
   moveq #$00, D0
   move.b shot_sel, D0
