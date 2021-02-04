@@ -20,14 +20,18 @@ string_table_mem = $10AC40
 menu_sel_vars_start = $10F9A0
 level_sel = $10F9A0
 loop_sel = $10F9A1
-shot_sel = $10F9A2
-bomb_sel = $10F9A3
-bonus_sel = $10F9A4
+bee_sel = $10F9A2
+shot_sel = $10F9A3
+bomb_sel = $10F9A4
+bonus_sel = $10F9A5
+rank_sel = $10F9A6
 
 skipped_to_stage = $10f900
 stage_skip_count = $10f904
 
 string_table_value_offset = $0C
+
+menu_max_index = $07
 
 b_input_up = $00
 b_input_down = $01
@@ -172,17 +176,18 @@ hijack_game_start:
 
 ;---------------------------
 hijack_warning_screen:
-  moveq #$30, D0
+  moveq #$40, D0
   movea.l #string_pos_pointer_table_mem, A0
   movea.l #string_pos_pointer_table, A1
   bsr copy_mem
 
-  moveq #$60, D0
+  moveq #$00, D0
+  move.b #$80, D0
   movea.l #string_table_mem, A0
   movea.l #string_table, A1
   bsr copy_mem
 
-  moveq #$05, D0
+  moveq #menu_max_index, D0
   movea.l #menu_sel_vars_start, A0
   movea.l #default_value_table, A1
   bsr copy_mem
@@ -246,7 +251,7 @@ handle_menu_inputs:
     subi.b #$01, D0
     bpl .menu_index_ok
 
-    moveq #$05, D0
+    moveq #menu_max_index, D0
     
 .menu_index_ok
     move.b D0, menu_index
@@ -261,8 +266,8 @@ handle_menu_inputs:
   
     move.b menu_index, D0
     addi.b #$01, D0
-    cmpi.b #$06, D0
-    bne .menu_index_ok
+    cmpi.b #menu_max_index, D0
+    ble .menu_index_ok
 
     moveq #$00, D0
 
@@ -317,7 +322,7 @@ handle_menu_inputs:
   beq .input_exit
   
   move.b menu_index, D0
-  cmpi.b #$05, D0
+  cmpi.b #menu_max_index, D0
   bne .input_exit
 
   moveq #$01, D0 ; Exit menu
@@ -329,8 +334,6 @@ handle_menu_inputs:
 ;---------------------------
 
 ;---------------------------
-;string_table_value_offset
-
 update_menu_value:
     moveq #$00, D0
     move.b menu_index, D0
@@ -355,7 +358,7 @@ update_menu_value:
 ;---------------------------
 update_menu_selection:
   moveq #$0, D1
-  moveq #$5, D0
+  moveq #menu_max_index, D0
   move.b #$C4, D2
   movea.l #string_pos_pointer_table_mem, A0
 
@@ -378,7 +381,7 @@ update_menu_selection:
 
 ;---------------------------
 draw_menu:
-  moveq #$5, D0
+  moveq #menu_max_index, D0
 
 .draw_text_loop
   bsr draw_text
@@ -447,10 +450,10 @@ nibble_to_char:
   dc.b "0123456789ABCDEF"
 
 max_value_table:
- dc.b $06, $01, $04, $06, $0F, $00
+ dc.b $06, $01, $01, $04, $06, $0F, $01, $00
 
 default_value_table:
- dc.b $00, $00, $04, $06, $0F, $00
+ dc.b $00, $00, $00, $04, $06, $0F, $00, $00
 
 ; Each entry 8 bytes
 ; Layout: CC CC PP PP AA AA AA AA
@@ -462,14 +465,18 @@ level_pos_pointer:
   dc.b $C0, $00, $02, $88, $00, $10, $AC, $40
 loop_pos_pointer:
   dc.b $C4, $00, $02, $80, $00, $10, $AC, $50
-shot_pos_pointer:
+bee_pos_pointer:
   dc.b $C4, $00, $02, $78, $00, $10, $AC, $60
-bomb_pos_pointer:
+shot_pos_pointer:
   dc.b $C4, $00, $02, $70, $00, $10, $AC, $70
-bonus_pos_pointer:
+bomb_pos_pointer:
   dc.b $C4, $00, $02, $68, $00, $10, $AC, $80
-exit_pos_pointer:
+bonus_pos_pointer:
   dc.b $C4, $00, $02, $60, $00, $10, $AC, $90
+rank_pos_pointer:
+  dc.b $C4, $00, $02, $58, $00, $10, $AC, $A0
+exit_pos_pointer:
+  dc.b $C4, $00, $02, $50, $00, $10, $AC, $B0
 
 ; Each entry is 16 bytes long
 string_table:
@@ -477,11 +484,15 @@ level_string:
   dc.b "      LEVEL 0 \\\\"
 loop_string:
   dc.b "       LOOP 0 \\\\"
+bee_string:
+  dc.b "   KILL BEE 0 \\\\"
 shot_string:
   dc.b "       SHOT 4 \\\\"
 bomb_string:
   dc.b "       BOMB 6 \\\\"
 bonus_string:
-  dc.b "      BONUS 15\\\\"  
+  dc.b "  MAX BONUS 15\\\\"  
+rank_string:
+  dc.b "   MAX RANK 0 \\\\"  
 exit_string:
   dc.b "       EXIT   \\\\"  
