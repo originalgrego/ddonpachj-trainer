@@ -31745,7 +31745,7 @@
 036218  add.b   D5, D0
 03621A  move.b  D0, ($df,A6)
 03621E  move.l  #$38000, ($16,A5)
-036226  move.l  #$c4e00280, ($1a,A5) ; Initialize big bee's timer and something
+036226  move.l  #$c4e00280, ($1a,A5) ; Initialize big bee's autodestruct and destruct timer
 03622E  move.l  #$140000, ($1e,A5)
 036236  move.l  #$40010, ($22,A5)
 03623E  move.w  #$80, ($26,A5)

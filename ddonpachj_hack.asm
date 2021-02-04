@@ -139,9 +139,15 @@ input_start = $0080
   
 ;---------------------------
 kill_big_bee:
-   move.l  #$00e00280, ($1a,A5) ; Initialize big bee's timer and something
-   move.l  #$140000, ($1e,A5)
-   jmp $036236  
+  move.l  #$c4e00280, ($1a,A5) ; Original big bee autodestruct/destruct timer values
+
+  tst.b bee_sel
+  beq .big_bee_continue
+  move.l  #$00e00280, ($1a,A5)
+
+.big_bee_continue
+  move.l  #$140000, ($1e,A5)
+  jmp $036236  
 ;---------------------------
 
 ;---------------------------
