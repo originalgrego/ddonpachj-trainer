@@ -34,6 +34,7 @@ rank_sel = $10F9A6
 
 skipped_to_stage = $10f900
 stage_skip_count = $10f904
+player_clicked_in = $10f908
 
 string_table_value_offset = $0C
 
@@ -136,13 +137,25 @@ full_rank_surv_time = $0001F800
  org $036226
   jmp kill_big_bee
   
- org $06b7cf
-;  incbin  "config_text.bin"
+ org $04781C
+  jmp hijack_player_weapon_select
 
 ;============================
 ; Free space
 ;============================
  org $098000
+
+;---------------------------
+hijack_player_weapon_select:
+  moveq #$01, D0
+  move.b D0, player_clicked_in
+
+  move.b  #$20, ($72,A6)
+  move.b  #$0, ($73,A6)
+  andi.b  #$fb, $102cc9.l
+  
+  jmp $047830
+;---------------------------
   
 ;---------------------------
 kill_big_bee:
@@ -161,6 +174,9 @@ kill_big_bee:
 hijack_game_start:
   move.b skipped_to_stage, D5
   bne .game_start_exit
+  
+  move.b player_clicked_in, D5
+  beq .game_start_exit
   
   move.b stage_skip_count, D5
   cmpi.b #$4, D5
@@ -415,6 +431,8 @@ draw_text:
 
 ;---------------------------
 hijack_initialize_player_shot:
+  move.b player_clicked_in, D0
+  beq .init_p_shot_continue  
 
   moveq #$01, D0
   move.b D0, invincible ; Make invincible
