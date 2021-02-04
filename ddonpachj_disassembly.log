@@ -31745,7 +31745,7 @@
 036218  add.b   D5, D0
 03621A  move.b  D0, ($df,A6)
 03621E  move.l  #$38000, ($16,A5)
-036226  move.l  #$c4e00280, ($1a,A5)
+036226  move.l  #$c4e00280, ($1a,A5) ; Initialize big bee's timer and something
 03622E  move.l  #$140000, ($1e,A5)
 036236  move.l  #$40010, ($22,A5)
 03623E  move.w  #$80, ($26,A5)
@@ -33253,7 +33253,7 @@
 0380AC  bne     $380be
 0380AE  tst.w   $1017be.l
 0380B4  bne     $380be
-0380B6  subq.w  #1, ($1a,A5)
+0380B6  subq.w  #1, ($1a,A5) ; Decrement big bee autodestruct timer
 0380BA  beq     $38140
 0380BE  move.b  (A6), D1
 0380C0  or.b    ($60,A6), D1
@@ -38194,9 +38194,14 @@
 040548  jsr     $58edc.l
 04054E  btst    #$6, (A6)
 040552  bne     $40562
+
+; Check if maximum after ending of first loop
 040554  tst.w   $101924.l
 04055A  beq     $40562
+
 04055C  jsr     $59090.l
+; Check if maximum after ending of first loop
+
 040562  movea.l #$704094, A0
 040568  move.l  #$c70030fe, D0
 04056E  moveq   #$2, D2
@@ -38322,13 +38327,20 @@
 043CBE  btst    #$3, D1
 043CC2  beq     $43cda
 043CDA  rts
+
+;
 043CDC  btst    #$4, D1
 043CE0  beq     $43cec
+
 043CE2  lea     $10e8ce.l, A0
 043CE8  bsr     $44070
+
 043CEC  btst    #$3, D1
 043CF0  beq     $43cfc
+
 043CFC  rts
+;
+
 043CFE  lea     $10e8ce.l, A0
 043D04  bra     $44070
 043D1A  move.l  D0, D3
@@ -38421,6 +38433,8 @@
 043ED2  btst    #$3, D1
 043ED6  bne     $43eda
 043ED8  rts
+
+; Add to score
 044070  lea     $101616.l, A1
 044076  move.l  D0, (A1)+
 044078  sub.w   D2, D2
@@ -38429,6 +38443,8 @@
 04407E  abcd    -(A1), -(A0)
 044080  abcd    -(A1), -(A0)
 044082  rts
+; Add to score
+
 044084  move.w  $1017f0.l, D0
 04408A  btst    #$2, D1
 04408E  bne     $4409a
@@ -42633,6 +42649,8 @@
 04D50A  rts
 04D514  move.w  #$200, ($1c,A0)
 04D51A  bra     $4cd94
+
+;
 04D5DC  move.w  ($10,A6), D0
 04D5E0  add.w   D0, D0
 04D5E2  lea     (-$22,PC) ; ($4d5c2), A0
@@ -42649,8 +42667,10 @@
 04D614  move.b  #$f, ($19,A6)
 04D61A  move.w  ($12,A6), D0
 04D61E  beq     $4d63c
+
 04D620  cmpi.w  #$5, D0
 04D624  bcs     $4d62a
+
 04D62A  move.b  (-$56,PC,D0.w), ($2,A6)
 04D630  add.w   D0, D0
 04D632  lea     ($3a,PC) ; ($4d66e), A0
@@ -42660,14 +42680,18 @@
 04D646  move.b  #$30, ($1b,A6)
 04D64C  cmpi.w  #$1e00, D1
 04D650  bcc     $4d658
+
 04D652  move.b  #$10, ($1b,A6)
 04D658  jsr     $578cc.l
 04D65E  bpl     $4d662
+
 04D660  neg.b   D0
 04D662  andi.w  #$6, D0
 04D666  addq.w  #6, D0
 04D668  move.b  D0, ($1a,A6)
 04D66C  rts
+;
+
 04D678  btst    #$d, D1
 04D67C  beq     $4d68e
 04D68E  cmpi.w  #$4, ($14,A6)
@@ -49128,7 +49152,7 @@
 05908A  movem.l (A7)+, D0-D7/A0-A1
 05908E  rts
 
-;
+; Show MAXIMUM in bomb supply
 059090  movea.l #$704104, A0
 059096  move.l  #$c7000000, D0
 05909C  move.b  $102cb0.l, D0
@@ -49138,7 +49162,7 @@
 0590AA  moveq   #$1, D2
 0590AC  moveq   #$b, D3
 0590AE  jmp     $570d4.l
-;
+; Show MAXIMUM in bomb supply
 
 0591DC  movea.l #$704094, A0
 0591E2  bra     $591ea
@@ -49295,6 +49319,7 @@
 0596A0  bsr     $5a292
 0596A4  bcs     $59674
 0596A6  movem.w ($6,A0), D2-D3
+
 0596AC  movem.w ($6,A6), D0-D1
 0596B2  move.w  #$1800, D4
 0596B6  add.w   D4, D0

@@ -9,16 +9,16 @@ menu_index = $10AC00
 last_frame = $10AC04
 last_input = $10AC08
 
-string_pos_pointer_table_mem = $10AC10
-string_table_mem = $10AC40 ; Offset 48 bytes
+string_pos_pointer_table_mem = $10AD00
+string_table_mem = $10AC40
 
 ; Menu selection variables, each is one byte long
-menu_sel_vars_start = $10ACA0 ; Offset 96 bytes
-level_sel = $10ACA0
-loop_sel = $10ACA1
-shot_sel = $10ACA2
-bomb_sel = $10ACA3
-bonus_sel = $10ACA4
+menu_sel_vars_start = $10F9A0
+level_sel = $10F9A0
+loop_sel = $10F9A1
+shot_sel = $10F9A2
+bomb_sel = $10F9A3
+bonus_sel = $10F9A4
 
 skipped_to_stage = $10f900
 stage_skip_count = $10f904
@@ -116,8 +116,10 @@ input_start = $0080
   jmp hijack_initialize_player
 
  org $00641E
-;  jmp hijack_initialize_player_shot
+  jmp hijack_initialize_player_shot
   
+ org $036226
+  jmp kill_big_bee
   
  org $06b7cf
 ;  incbin  "config_text.bin"
@@ -127,6 +129,11 @@ input_start = $0080
 ;============================
  org $098000
   
+kill_big_bee:
+   move.l  #$00e00280, ($1a,A5) ; Initialize big bee's timer and something
+   move.l  #$140000, ($1e,A5)
+   jmp $036236  
+
 ;---------------------------
 hijack_game_start:
   move.b skipped_to_stage, D5
@@ -139,10 +146,17 @@ hijack_game_start:
   addi.b #$01, D5
   move.b D5, stage_skip_count
   bra .game_start_exit
-  
+    
 .do_skip
+  jsr $59090 ; Maximum test
+ 
+
   move.b #$01, D5
   move.b D5, skipped_to_stage
+  
+  move.l #$00050001, D5
+  move.l D5, level
+  
   jsr $1fa40.l ; End level
   
 .game_start_exit
