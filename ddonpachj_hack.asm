@@ -64,7 +64,7 @@ input_start = $0080
 
  ; Level end test
  org $048668
-;   jmp hijack_game_start
+   jmp hijack_game_start
 
 ;---------------------------------- 
 ; Player never lose invi
@@ -133,10 +133,12 @@ input_start = $0080
 ;============================
  org $098000
   
+;---------------------------
 kill_big_bee:
    move.l  #$00e00280, ($1a,A5) ; Initialize big bee's timer and something
    move.l  #$140000, ($1e,A5)
    jmp $036236  
+;---------------------------
 
 ;---------------------------
 hijack_game_start:
@@ -154,12 +156,12 @@ hijack_game_start:
 .do_skip
   jsr $59090 ; Maximum test
  
-
   move.b #$01, D5
   move.b D5, skipped_to_stage
   
-  move.l #$00050001, D5
-  move.l D5, level
+  moveq #$0, D5
+  move.b level_sel, D5
+  move.w D5, level
   
   jsr $1fa40.l ; End level
   
@@ -192,6 +194,8 @@ hijack_warning_screen:
   bsr draw_menu
 
   bsr handle_menu_inputs
+  tst.b D0
+  bne .exit
 
 .menu_wait_loop
   move.w frame_counter, D0
@@ -201,7 +205,26 @@ hijack_warning_screen:
   bra .menu_wait_loop
 
 .exit
+  bsr prep_menu_results 
+
   jmp $00554E
+;---------------------------
+
+;---------------------------
+prep_menu_results:
+  move.b level_sel, D0
+  beq .menu_results_dont_skip
+
+  sub.b #$01, D0
+  move.b D0, level_sel
+  bra .menu_results_exit
+
+.menu_results_dont_skip
+  move.b #$01, D1
+  move.b D1, skipped_to_stage
+  
+.menu_results_exit
+  rts
 ;---------------------------
 
 ;---------------------------
@@ -297,9 +320,11 @@ handle_menu_inputs:
   cmpi.b #$05, D0
   bne .input_exit
 
-  bra .exit
+  moveq #$01, D0 ; Exit menu
+  rts
 
 .input_exit
+  moveq #$00, D0
   rts
 ;---------------------------
 
@@ -386,8 +411,6 @@ hijack_initialize_player_shot:
 
 ;---------------------------
 hijack_initialize_player:
-;  jsr     $1fa40.l ; End level
-
   moveq   #$c, D5
 
 .loop
@@ -395,8 +418,12 @@ hijack_initialize_player:
   dbra    D5, .loop
   
   moveq #$00, D5
+  move.b loop_sel, D5
+  move.w D5, second_loop
+
   move.b bomb_sel, D5
   move.b D5, bomb_count
+
   cmpi.b #$03, D5
   bge .init_player_continue
 
