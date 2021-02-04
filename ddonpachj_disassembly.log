@@ -43560,7 +43560,7 @@
 04E9D0  move.w  D0, ($6,A6)
 04E9D4  rts
 
-04E9D6  addi.w  #$16, $101924.l
+04E9D6  addi.w  #$16, $101924.l ; This must be increased with max bonus for MAXIMUM to show
 04E9DE  addq.w  #1, $10192a.l ; Increase max bonus
 04E9E4  bclr    #$6, $102c8c.l
 04E9EC  bne     $4ea06

@@ -10,6 +10,10 @@ bomb_max = $102CB1
 rank = $101968
 survival_time = $101970
 
+max_bonus = $10192a
+max_bonus_2 = $10192c
+max_bonus_3 = $101924
+
 ; free_mem = $10AC00
 menu_index = $10AC00
 last_frame = $10AC04
@@ -68,7 +72,6 @@ full_rank_surv_time = $0001F800
  org $000b02
   nop
   nop
-
 
  ; Level end test
  org $048668
@@ -412,13 +415,32 @@ draw_text:
 
 ;---------------------------
 hijack_initialize_player_shot:
+
+  moveq #$01, D0
+  move.b D0, invincible ; Make invincible
+
   moveq #$00, D0
   move.b shot_sel, D0
   move.b D0, shot_power
   move.b D0, laser_power
 
-  move.b D0, invincible ; Make invincible
+  moveq #$00, D0
+  move.b bonus_sel, D0
+  beq .init_p_shot_continue
   
+  move.w D0, max_bonus
+  move.w D0, max_bonus_2
+ 
+  subi #$01, D0
+ 
+  moveq #$00, D1
+.bonus_loop
+  addi #$16, D1 
+  dbra D0, .bonus_loop
+  
+  move.w D1, max_bonus_3
+
+.init_p_shot_continue  
   jmp $006424
 ;---------------------------
 
