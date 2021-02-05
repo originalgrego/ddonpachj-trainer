@@ -165,17 +165,37 @@ hijack_game_start:
   beq .game_start_exit
   
   move.b stage_skip_count, D5
-  cmpi.b #$04, D5
+  cmpi.b #$03, D5
   bne .check_skip
 
     tst.b maximum_applied
     bne .check_skip
 
       move.b #$01, maximum_applied
-   ;   jsr $59090 ; Call maximum prep method
+
+      movem.l D0-D7/A0-A1, -(A7)
+
+      moveq #$00, D0
+      move.b bonus_sel, D0
+      
+      move.w D0, max_bonus
+      move.w D0, max_bonus_2
+     
+      subi #$01, D0
+     
+      moveq #$00, D1
+      
+.bonus_loop
+      addi #$16, D1 
+      dbra D0, .bonus_loop
+      
+      move.w D1, max_bonus_3
+      
+      jsr $59090 ; Call maximum prep method
+      movem.l (A7)+, D0-D7/A0-A1
 
 .check_skip
-  cmpi.b #$4, D5
+  cmpi.b #$04, D5
   beq .do_skip
 
 .increment_start_count
@@ -452,29 +472,6 @@ hijack_initialize_player_shot:
   move.b shot_sel, D0
   move.b D0, shot_power
   move.b D0, laser_power
-
-  moveq #$00, D0
-  move.b bonus_sel, D0
-  beq .init_p_shot_continue
-  
-  move.w D0, max_bonus
-  move.w D0, max_bonus_2
- 
-  subi #$01, D0
- 
-  ; Preserve D1, its used during demos
-  move.l D1, -(A7)
-
-  moveq #$00, D1
-  
-.bonus_loop
-  addi #$16, D1 
-  dbra D0, .bonus_loop
-  
-  move.w D1, max_bonus_3
-
-  ; Restore D1, its used during demos
-  move.l (A7)+, D1
 
 .init_p_shot_continue  
   jmp $006424
