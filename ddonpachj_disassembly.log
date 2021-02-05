@@ -3574,8 +3574,11 @@
 006446  move.l  (A3,D0.w), ($4,A4)
 
 00644C  jsr     $58f0c.l
-006452  tst.b   $1017a5.l
+
+006452  tst.b   $1017a5.l ; Check to see if its a demo
 006458  bpl     $6492
+
+; Demo stuff that needs D1 to be preserved
 
 006492  btst    #$6, $1017a9.l
 00649A  beq     $64aa
@@ -5955,6 +5958,7 @@
 00E218  bne     $e228
 00E228  tst.w   D0
 00E22A  bne     $e1c4
+
 00E26E  btst    #$5, (A6)
 00E272  beq     $e384
 00E276  lea     $10e880.l, A0

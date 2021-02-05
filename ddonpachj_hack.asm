@@ -165,14 +165,14 @@ hijack_game_start:
   beq .game_start_exit
   
   move.b stage_skip_count, D5
-  cmpi.b #$02, D5
+  cmpi.b #$04, D5
   bne .check_skip
 
     tst.b maximum_applied
     bne .check_skip
 
       move.b #$01, maximum_applied
-      jsr $59090 ; Call maximum prep method
+   ;   jsr $59090 ; Call maximum prep method
 
 .check_skip
   cmpi.b #$4, D5
@@ -462,12 +462,19 @@ hijack_initialize_player_shot:
  
   subi #$01, D0
  
+  ; Preserve D1, its used during demos
+  move.l D1, -(A7)
+
   moveq #$00, D1
+  
 .bonus_loop
   addi #$16, D1 
   dbra D0, .bonus_loop
   
   move.w D1, max_bonus_3
+
+  ; Restore D1, its used during demos
+  move.l (A7)+, D1
 
 .init_p_shot_continue  
   jmp $006424
