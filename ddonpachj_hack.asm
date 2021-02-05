@@ -76,7 +76,7 @@ full_rank_surv_time = $0001F800
   nop
   nop
 
- ; Level end test
+ ; Check for level skip/max bonus
  org $048668
    jmp hijack_game_start
 
@@ -109,7 +109,8 @@ full_rank_surv_time = $0001F800
  org $057626
    nop
    nop
-   
+ 
+ ; Do not display original warning
  org $575d0
    rts
 ;---------------------------------- 
@@ -246,6 +247,18 @@ hijack_warning_screen:
   movea.l #menu_sel_vars_start, A0
   movea.l #default_value_table, A1
   bsr copy_mem
+
+  moveq #$0, D0
+  bsr draw_credit
+
+  moveq #$1, D0
+  bsr draw_credit
+
+  moveq #$2, D0
+  bsr draw_credit
+
+  moveq #$3, D0
+  bsr draw_credit
 
 .redraw_menu
   move.w frame_counter, D0
@@ -451,11 +464,22 @@ draw_menu:
 ;---------------------------
 
 ;---------------------------
+draw_credit:
+  movea.l #credits_string_pos_pointer_table, A1 ; Vram location data/string pointer
+  bra draw_text_impl
+;---------------------------
+
+;---------------------------
 draw_text:
+  movea.l #string_pos_pointer_table_mem, A1 ; Vram location data/string pointer
+  bra draw_text_impl
+;---------------------------
+
+;---------------------------
+draw_text_impl:
   movem.l D0-D3/A1, -(A7)
   andi.w  #$ff, D0
   lsl.w   #3, D0 ; Get offset into location/pointer table
-  movea.l #string_pos_pointer_table_mem, A1 ; Vram location data/string pointer
 
   jmp $0575E0
 ;---------------------------
@@ -563,8 +587,28 @@ shot_string:
 bomb_string:
   dc.b "       BOMB 6 \\\\"
 bonus_string:
-  dc.b "  MAX BONUS 15\\\\"  
+  dc.b "  MAX BONUS F \\\\"  
 rank_string:
   dc.b "   MAX RANK 0 \\\\"  
 exit_string:
   dc.b "       EXIT   \\\\"  
+
+credits_string_pos_pointer_table:
+  dc.b $C0, $00, $02, $98
+  dc.l credit_1
+  dc.b $C0, $00, $02, $40
+  dc.l credit_2
+  dc.b $C0, $00, $02, $30
+  dc.l credit_3
+  dc.b $C0, $00, $02, $28
+  dc.l credit_4
+
+credits_string_table:
+credit_1:
+  dc.b "DODONPACHI TRAINER 1.0\\\\"
+credit_2:
+  dc.b "CREATED BY GREGO\\\\"
+credit_3:
+  dc.b "FUNDED BY\\\\"
+credit_4:
+  dc.b "    ELECTRIC UNDERGROUND\\\\"
