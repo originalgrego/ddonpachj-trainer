@@ -178,10 +178,10 @@ hijack_game_start:
 
       moveq #$00, D0
       move.b bonus_sel, D0
-      
+            
       move.w D0, max_bonus
       move.w D0, max_bonus_2
-     
+
       subi #$01, D0
      
       moveq #$00, D1
@@ -192,6 +192,11 @@ hijack_game_start:
       
       move.w D1, max_bonus_3
       
+      move.w  max_bonus_3, D0
+      jsr     $576b6.l ; Update score?
+
+      move.l  D2, $101926.l
+  
       jsr $59090 ; Call maximum prep method
       movem.l (A7)+, D0-D7/A0-A1
 
@@ -546,10 +551,10 @@ nibble_to_char:
   dc.b "0123456789ABCDEF"
 
 max_value_table:
- dc.b $06, $01, $01, $04, $06, $0F, $01, $00
+  dc.b $06, $01, $01, $04, $06, $0F, $01, $00
 
 default_value_table:
- dc.b $00, $00, $00, $04, $06, $0F, $00, $00
+  dc.b $00, $00, $00, $04, $06, $0F, $00, $00
 
 ; Each entry 8 bytes
 ; Layout: CC CC PP PP AA AA AA AA
@@ -605,7 +610,7 @@ credits_string_pos_pointer_table:
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.0\\\\"
+  dc.b "DODONPACHI TRAINER 1.01\\\\"
 credit_2:
   dc.b "CREATED BY GREGO\\\\"
 credit_3:

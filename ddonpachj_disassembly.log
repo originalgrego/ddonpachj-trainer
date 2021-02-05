@@ -43296,26 +43296,33 @@
 04E1C8  bsr     $4eeee
 04E1CC  move.w  D0, D0
 04E1CE  rts
+
+;
 04E1D0  lea     $10a9f6.l, A6
 04E1D6  moveq   #$9, D7
 04E1D8  move.w  (A6), D1
 04E1DA  beq     $4e1f2
+
 04E1DC  move.w  $10e85c.l, D0
 04E1E2  sub.w   D0, ($8,A6)
 04E1E6  moveq   #$7, D0
 04E1E8  and.w   D1, D0
 04E1EA  add.w   D0, D0
 04E1EC  add.w   D0, D0
-04E1EE  jsr     ($c,PC,D0.w)
+
+04E1EE  jsr     ($c,PC,D0.w) ; Jump to one of the branches below
 04E1F2  lea     ($20,A6), A6
 04E1F6  dbra    D7, $4e1d8
 04E1FA  rts
+
 04E1FC  bra     $4e21c
 04E200  bra     $4e5fe
-04E204  bra     $4e894
+04E204  bra     $4e894 ; Check max bonus
 04E20C  bra     $4ec16
 04E210  bra     $4ed04
 04E214  bra     $4edfa
+;
+
 04E21C  tst.b   D1
 04E21E  bpl     $4e226
 04E220  jmp     $4d678.l
