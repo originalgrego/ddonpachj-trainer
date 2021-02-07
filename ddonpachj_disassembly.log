@@ -2295,6 +2295,28 @@
 004870  bcc     $487c
 00487C  btst    #$2, $1017a8.l
 004884  beq     $48fe
+004888  jsr     $48182.l
+00488E  bcs     $48fc
+004890  andi.w  #$aff, $1017a8.l
+004898  moveq   #$2, D0
+00489A  move.w  #$0, D1
+00489E  jsr     $57dae.l
+0048A4  move.w  $101754.l, (-$c,A0)
+0048AC  bsr     $50ce
+0048B0  move.w  D0, $101964.l
+0048B6  bsr     $52ae
+0048BA  jsr     $448f8.l
+0048C0  jsr     $44882.l
+0048C6  lea     $100e10.l, A0
+0048CC  clr.w   (A0)
+0048CE  clr.w   ($10,A0)
+0048D2  move.w  $1017a8.l, D6
+0048D8  moveq   #$20, D1
+0048DA  moveq   #$7, D0
+0048DC  and.w   D6, D1
+0048DE  bne     $48f0
+0048F0  jmp     $58316.l
+0048FC  rts
 0048FE  move.w  #$100, D6
 004902  move.w  #$eef, D7
 004906  btst    #$0, $1017a8.l
@@ -2323,6 +2345,36 @@
 004A8E  move.w  #$ddf, D7
 004A92  btst    #$1, $1017a8.l
 004A9A  beq     $4b4a
+004A9E  cmpi.w  #$8, $1017a6.l
+004AA6  bne     $4ab4
+004AB4  tst.w   $1017b2.l
+004ABA  bne     $4aea
+004ABC  btst    #$7, $101295.l
+004AC4  bne     $4af2
+004AC6  move.w  #$2e, D0
+004ACA  jsr     $574c6.l
+004AD0  addq.w  #1, ($a,A5)
+004AD4  jsr     $56efe.l
+004ADA  btst    #$4, $104aef.l
+004AE2  beq     $4aea
+004AEA  cmpi.w  #$4b0, ($a,A5)
+004AF0  bcs     $4b10
+004B10  tst.w   $1017b2.l
+004B16  bne     $4b4a
+004B18  move.w  #$930, D1
+004B1C  move.w  ($a,A5), D3
+004B20  moveq   #$0, D4
+004B22  subi.w  #$78, D3
+004B26  bcs     $4b2c
+004B28  addq.w  #1, D4
+004B2A  bra     $4b22
+004B2C  move.w  #$99, D2
+004B30  sub.w   D4, D2
+004B32  move.w  #$4000, D3
+004B36  move.w  #$3a00, D4
+004B3A  move.w  #$101, D5
+004B3E  jsr     $5a424.l
+004B44  jsr     $58450.l
 004B4A  subq.w  #1, $101286.l
 004B50  bcc     $4b72
 004B52  move.w  #$2, $101286.l
@@ -2343,6 +2395,46 @@
 004BD2  jsr     $5834c.l
 004BD8  and.w   $1013a8.l, D6
 004BDE  beq     $3cce
+004BE2  move.w  (A1), $1013ac.l
+004BE8  sub.w   D1, (A1)
+004BEA  ori.w   #$c000, $10125c.l
+004BF2  move.w  $10125c.l, $e00000.l
+004BFC  clr.w   $10e86a.l
+004C02  and.w   D7, $1017a8.l
+004C08  cmpi.w  #$100, D6
+004C0C  bne     $4c38
+004C0E  bset    #$2, $1017a8.l
+004C16  jsr     $584a2.l
+004C1C  bsr     $52ae
+004C20  lea     $10174e.l, A0
+004C26  lea     $10161e.l, A1
+004C2C  lea     $10162a.l, A2
+004C32  clr.w   ($2,A5)
+004C36  bra     $4c60
+004C60  moveq   #$0, D0
+004C62  move.l  D0, (A1)
+004C64  move.l  D0, (A2)
+004C66  move.l  D0, ($8,A2)
+004C6A  move.l  D0, ($10,A2)
+004C6E  move.l  D0, ($18,A2)
+004C72  move.l  D0, ($20,A2)
+004C76  move.l  D0, ($28,A2)
+004C7A  move.l  D0, ($30,A2)
+004C7E  move.l  D0, ($38,A2)
+004C82  addq.w  #1, (A0)
+004C84  cmpi.w  #$109, (A0)
+004C88  bcs     $4c8e
+004C8E  tst.w   ($4,A5)
+004C92  beq     $4caa
+004C96  jsr     $58482.l
+004C9C  jsr     $58472.l
+004CA2  moveq   #$0, D0
+004CA4  move.l  D0, $1013ae.l
+004CAA  bset    #$7, $1017a9.l
+004CB2  moveq   #$30, D0
+004CB4  and.w   $1017a8.l, D0
+004CBA  bne     $4cc4
+004CC4  rts
 004CD6  btst    #$1, $1017a5.l
 004CDE  bne     $4e74
 004CE2  bsr     $486a
@@ -2352,6 +2444,7 @@
 004CF4  bne     $4d02
 004CF6  cmpi.w  #$8, $1017a6.l
 004CFE  beq     $4dae
+004D02  rts
 004DAE  tst.w   ($4,A5)
 004DB2  bne     $4de4
 004DB6  jsr     $572ba.l
@@ -2538,6 +2631,14 @@
 00526C  bcs     $52a8
 0052A8  movem.l (A7)+, D0-D7/A0-A6
 0052AC  rts
+0052AE  lea     $1017c8.l, A0
+0052B4  moveq   #$0, D0
+0052B6  move.w  D0, (A0)+
+0052B8  cmpa.l  #$1017f0, A0
+0052BE  bne     $52b6
+0052C0  move.w  D0, $101842.l
+0052C6  move.l  D0, $1017cc.l
+0052CC  rts
 0052FC  move    #$2700, SR
 005300  move.w  #$18f, D0
 005304  move.w  #$63, D1
@@ -4254,6 +4355,8 @@
 0074FC  move.w  (A1)+, (A0)+
 0074FE  move.b  #$1, (-$1,A0)
 007504  bra     $74b4
+
+;
 00761C  movem.l D0/D6-D7/A0-A2/A6, -(A7)
 007620  lea     $1038ce.l, A6
 007626  lea     $103f0e.l, A0
@@ -4261,15 +4364,18 @@
 007632  lea     $102d0c.l, A2
 007638  btst    #$1, $102cc9.l
 007640  bne     $764e
+
 007642  move.w  #$8c, D0
 007646  tst.w   $102caa.l
 00764C  bne     $76a2
+
 00764E  move.w  #$18, D0
 007652  move.w  $102ca8.l, D1
 007658  add.w   D1, D1
 00765A  add.w   D1, D1
 00765C  add.w   D1, D0
 00765E  bra     $76a2
+
 0076A2  jsr     $6d360.l
 0076A8  bclr    #$7, ($1,A2)
 0076AE  moveq   #$0, D0
@@ -4282,6 +4388,8 @@
 0076C2  dbra    D7, $76bc
 0076C6  movem.l (A7)+, D0/D6-D7/A0-A2/A6
 0076CA  rts
+;
+
 0076CC  bset    #$2, ($1,A6)
 0076D2  bne     $771e
 0076D6  moveq   #$2c, D7
@@ -40955,6 +41063,117 @@
 047E8E  jsr     $5a424.l
 047E94  move.w  D0, D0
 047E96  rts
+048182  lea     $10bdf6.l, A6
+048188  tst.w   (A6)
+04818A  bmi     $481d8
+04818E  lea     (-$26,PC) ; ($4816a), A0
+048192  lea     (-$1a,PC) ; ($4817a), A2
+048196  move.l  #$80000030, D4
+04819C  move.w  #$c7f1, D5
+0481A0  bsr     $4850a
+0481A4  clr.w   ($10,A6)
+0481A8  move.w  #$426c, ($64,A6)
+0481AE  move.w  #$302, ($6a,A6)
+0481B4  move.w  $101754.l, D0
+0481BA  move.w  D0, ($30,A6)
+0481BE  add.w   D0, D0
+0481C0  add.w   D0, D0
+0481C2  addq.w  #2, D0
+0481C4  move.w  (-$5c,PC,D0.w), ($68,A6)
+0481CA  move.w  #$258, ($32,A6)
+0481D0  move.w  $101756.l, ($34,A6)
+0481D8  moveq   #$3, D7
+0481DA  jsr     $56ee4.l
+0481E0  subq.w  #1, ($32,A6)
+0481E4  beq     $481fc
+0481E6  lea     $104aec.l, A0
+0481EC  move.w  (A0), D0
+0481EE  move.w  $10128e.l, D0
+0481F4  andi.w  #$50, D0
+0481F8  beq     $48228
+0481FC  move.w  #$8, D0
+048200  jsr     $6d49c.l
+048206  move.w  ($30,A6), $101754.l
+04820E  move.w  ($34,A6), $101756.l
+048216  moveq   #$0, D0
+048218  move.w  D0, (A6)
+04821A  lea     ($20,A6), A6
+04821E  dbra    D7, $48218
+048222  move.b  D0, ($8,A5)
+048226  rts
+048228  btst    #$3, ($1,A0)
+04822E  beq     $48244
+048244  btst    #$2, ($1,A0)
+04824A  beq     $4825e
+04825E  btst    #$0, ($1,A0)
+048264  beq     $4826c
+04826C  btst    #$1, ($1,A0)
+048272  beq     $48284
+048284  moveq   #$2, D7
+048286  move.w  ($34,A6), D6
+04828A  movem.w ($2,A6), D1-D5
+048290  jsr     $5a424.l
+048296  addi.w  #$10, D0
+04829A  lea     ($20,A6), A6
+04829E  dbra    D7, $4828a
+0482A2  lea     (-$12a,PC) ; ($4817a), A0
+0482A6  lea     (-$13e,PC) ; ($4816a), A1
+0482AA  bra     $483ea
+0483EA  move.w  (-$30,A6), D0
+0483EE  add.w   D0, D0
+0483F0  move.w  (A0,D0.w), D1
+0483F4  add.w   D0, D0
+0483F6  movem.w (A1,D0.w), D3-D4
+0483FC  addi.w  #-$200, D3
+048400  addi.w  #-$200, D4
+048404  move.w  #$202, D5
+048408  move.w  D0, D2
+04840A  add.w   D0, D0
+04840C  add.w   D0, D0
+04840E  add.w   D0, D2
+048410  addi.w  #$1000, D2
+048414  jsr     $5a424.l
+04841A  cmpi.w  #$1, (-$30,A6)
+048420  bne     $48430
+048430  movem.w ($6,A6), D3-D4
+048436  move.w  #$101, D5
+04843A  moveq   #$3, D7
+04843C  subi.w  #$200, D4
+048440  tst.w   D6
+048442  bne     $4844a
+048444  addi.w  #$800, D3
+048448  bra     $4844e
+04844E  move.w  #$230, D1
+048452  moveq   #$4, D0
+048454  and.w   $10126e.l, D0
+04845A  bne     $48460
+04845C  move.w  #$30, D1
+048460  moveq   #$17, D2
+048462  jsr     $5a424.l
+048468  addi.w  #$200, D4
+04846C  dbra    D7, $48462
+048470  movem.w ($2,A6), D1-D5
+048476  addi.w  #-$200, D4
+04847A  jsr     $5a424.l
+048480  moveq   #$0, D0
+048482  subq.w  #1, D0
+048484  rts
+04850A  moveq   #$0, D7
+04850C  movea.l A6, A1
+04850E  moveq   #$3, D6
+048510  move.l  D4, (A1)
+048512  move.w  D5, ($4,A1)
+048516  move.w  #$101, ($a,A1)
+04851C  move.l  #$fe00fe00, ($c,A1)
+048524  move.w  (A2,D7.w), ($2,A1)
+04852A  move.w  D7, D3
+04852C  add.w   D3, D3
+04852E  move.l  (A0,D3.w), ($6,A1)
+048534  addq.w  #2, D7
+048536  addq.w  #1, D5
+048538  lea     ($20,A1), A1
+04853C  dbra    D6, $48510
+048540  rts
 048566  movem.l D0-D7/A0-A1, -(A7)
 04856A  move.w  D6, D5
 04856C  movea.l A0, A1
@@ -43326,7 +43545,7 @@
 04E1FA  rts
 
 04E1FC  bra     $4e21c ; Weapon upgrade
-04E200  bra     $4e5fe ; Happens every frame
+04E200  bra     $4e5fe ; Max power upgrade
 04E204  bra     $4e894 ; Check max bonus
 04E20C  bra     $4ec16
 04E210  bra     $4ed04
@@ -43339,8 +43558,8 @@
 
 04E220  jmp     $4d678.l
 
-04E226  btst    #$6, D1 ; Check max power?
-04E22A  bne     $4e4ee ; Max power upgrade?
+04E226  btst    #$6, D1 ;
+04E22A  bne     $4e4ee ; 
 
 04E22E  btst    #$4, D1
 04E232  bne     $4e25a
@@ -43382,10 +43601,11 @@
 04E2B2  move.w  ($1e,PC,D0.w), D0
 04E2B6  movea.l (A1), A0
 04E2B8  cmp.w   (A0), D0
-04E2BA  beq     $4e2c8 ; Skip upgrade
+04E2BA  beq     $4e2c8 ; Skip changing other shot vars
 
 04E2BC  addq.w  #2, $101856.l
 04E2C2  addq.w  #2, $10185a.l
+
 04E2C8  addq.w  #1, $102cac.l
 04E2CE  bra     $4e34c
 ; Increase shot strength
@@ -43515,7 +43735,7 @@
 04E4E2  jsr     $59de0.l
 04E4E8  jmp     $5a3f8.l
 
-; Handle MAX POWER upgrade
+;
 04E4EE  subq.w  #1, ($12,A6)
 04E4F2  bne     $4e51c
 
@@ -43547,12 +43767,54 @@
 04E61A  move.b  D0, ($1b,A6)
 04E61E  move.w  #$200, ($1c,A6)
 04E624  ori.b   #$8, ($1b,A6)
+
 04E62A  moveq   #$0, D2
 04E62C  btst    #$c, D1
 04E630  beq     $4e6c2
 
+; Handle max power upgrade
+04E634  move.w  $102cac.l, D0
+04E63A  add.w   $102cae.l, D0
+04E640  cmpi.w  #$8, D0
+04E644  beq     $4e758 ; Check already both at max power
+
+04E648  cmpi.w  #$4, $102cae.l ; Check laser power
+04E650  beq     $4e66e ; Upgrade shot
+
+04E652  move.w  #$4, $102cae.l ; Upgrade laser
+04E65A  clr.w   $100e20.l
+04E660  jsr     $761c.l
+04E666  andi.w  #$dffb, $102d0c.l
+
+04E66E  move.w  #$4, $102cac.l ; Upgrade shot to max
+
+04E676  lea     $101854.l, A1 ; Other shot var 1
+04E67C  lea     $101858.l, A2 ; Other shot var 2
+04E682  move.w  $101754.l, D0 ; Ship type
+04E688  add.w   D0, D0
+04E68A  add.w   D0, D0
+04E68C  lea     $61bc.l, A3
+04E692  lea     $61c8.l, A4
+
+04E698  tst.w   $102caa.l ; Check player something
+04E69E  beq     $4e6ac
+
+; Would load other a3/a4 addresses here if previous check didnt branch
+
+04E6AC  move.l  (A3,D0.w), (A1)
+04E6B0  addq.w  #8, ($2,A1)
+
+04E6B4  move.l  (A4,D0.w), (A2)
+04E6B8  addq.w  #8, ($2,A2)
+
+04E6BC  moveq   #$1, D2
+04E6BE  bra     $4e754
+;
+
 04E6C2  btst    #$b, D1
 04E6C6  beq     $4e788
+
+04E754  bra     $4e34c
 
 04E788  btst    #$6, $10e858.l
 04E790  bne     $4e85a
@@ -43576,6 +43838,8 @@
 04E814  cmpi.w  #$700, ($6,A6)
 04E81A  bls     $4e830
 04E81C  bra     $4e85a
+04E81E  cmpi.b  #$10, ($1b,A6)
+04E824  bcs     $4e840
 
 04E830  cmpi.b  #$10, ($1b,A6)
 04E836  bls     $4e85a
@@ -48437,6 +48701,18 @@
 057E30  lea     ($40,A0), A0
 057E34  dbra    D2, $57e2c
 057E38  rts
+057E3A  move.w  D0, D3
+057E3C  lsl.w   #3, D3
+057E3E  lea     $43a.l, A0
+057E44  move.w  ($6,A0,D3.w), D2
+057E48  andi.w  #$ff, D2
+057E4C  lea     $100002.l, A0
+057E52  lsl.w   #3, D3
+057E54  adda.w  D3, A0
+057E56  bclr    #$6, (A0)
+057E5A  lea     ($40,A0), A0
+057E5E  dbra    D2, $57e56
+057E62  rts
 057E64  andi.w  #$7fff, D0
 057E68  lea     $100000.l, A0
 057E6E  cmp.w   (A0)+, D0
@@ -48678,6 +48954,13 @@
 0582F6  suba.w  #$18, A4
 0582FA  dbra    D7, $582ea
 0582FE  rts
+058316  lsl.w   #4, D1
+058318  or.w    D1, $1017a8.l
+05831E  move.w  D0, $1017a6.l
+058324  clr.w   ($4,A5)
+058328  clr.w   $101764.l
+05832E  moveq   #$1, D0
+058330  bra     $57e3a
 05834C  move.w  D1, -(A7)
 05834E  move.w  #$30, D1
 058352  addi.w  #-$a00, D4
@@ -48702,6 +48985,15 @@
 058398  addi.w  #-$a00, D4
 05839C  move.w  #$105, D5
 0583A0  jmp     $5a424.l
+058450  lea     $1013aa.l, A1
+058456  move.w  (A1), D0
+058458  cmp.w   $1013ac.l, D0
+05845E  beq     $58470
+058460  move.w  D0, $1013ac.l
+058466  moveq   #$0, D0
+058468  move.w  D0, ($2,A5)
+05846C  move.w  D0, ($a,A5)
+058470  rts
 058472  movea.l #$704910, A0
 058478  moveq   #$1, D2
 05847A  moveq   #$c, D3
@@ -48714,6 +49006,10 @@
 058498  moveq   #$1, D2
 05849A  moveq   #$1d, D3
 05849C  jmp     $57152.l
+0584A2  movea.l #$704084, A0
+0584A8  moveq   #$1, D2
+0584AA  moveq   #$9, D3
+0584AC  jmp     $57152.l
 0584C2  rts
 0584C4  btst    #$0, $10126f.l
 0584CC  beq     $584c2

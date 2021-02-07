@@ -118,7 +118,7 @@ full_rank_surv_time = $0001F800
  org $0063E8
   jmp hijack_initialize_player
 
- org $00641E
+ org $006442
   jmp hijack_initialize_player_shot
   
  org $036226
@@ -491,6 +491,10 @@ draw_text_impl:
 
 ;---------------------------
 hijack_initialize_player_shot:
+  ; Update other shot variables
+  move.l  (A2,D0.w), (A4) 
+  move.l  (A3,D0.w), ($4,A4) 
+
   move.b player_clicked_in, D0
   beq .init_p_shot_continue  
 
@@ -502,8 +506,13 @@ hijack_initialize_player_shot:
   move.b D0, shot_power
   move.b D0, laser_power
 
+  rol.b #$1, D0
+
+  add.w  D0, $101856.l
+  add.w  D0, $10185a.l
+
 .init_p_shot_continue  
-  jmp $006424
+  jmp $00644C
 ;---------------------------
 
 ;---------------------------
@@ -610,7 +619,7 @@ credits_string_pos_pointer_table:
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.01\\\\"
+  dc.b "DODONPACHI TRAINER 1.02\\\\"
 credit_2:
   dc.b "CREATED BY GREGO\\\\"
 credit_3:
