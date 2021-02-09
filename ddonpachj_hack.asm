@@ -494,6 +494,10 @@ hijack_initialize_player_shot:
   ; Update other shot variables
   move.l  (A2,D0.w), (A4) 
   move.l  (A3,D0.w), ($4,A4) 
+  
+  move.b game_start_handled, D0
+  bne .init_p_shot_continue
+
 
   move.b player_clicked_in, D0
   beq .init_p_shot_continue  
@@ -522,7 +526,10 @@ hijack_initialize_player:
 .loop
   move.l  (A0)+, (A1)+ ; Initialize player data?
   dbra    D5, .loop
-  
+
+  move.b game_start_handled, D5
+  bne .init_player_exit
+
   moveq #$00, D5
   move.b loop_sel, D5
   move.w D5, second_loop
@@ -545,6 +552,7 @@ hijack_initialize_player:
 .init_player_continue  
   move.b D5, bomb_max
   
+.init_player_exit
   jmp $0063F0
 ;---------------------------
 
@@ -619,7 +627,7 @@ credits_string_pos_pointer_table:
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.02\\\\"
+  dc.b "DODONPACHI TRAINER 1.03\\\\"
 credit_2:
   dc.b "CREATED BY GREGO\\\\"
 credit_3:
