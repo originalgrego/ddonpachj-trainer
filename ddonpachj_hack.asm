@@ -1,4 +1,9 @@
+; up to offset 98562
+
+machine_credit1 = $1013AB
+chute_config = $101297
 input_p1 = $d00000
+input_p1_2 = $d00001
 frame_counter = $101270
 level = $101978
 second_loop = $10197A
@@ -24,7 +29,7 @@ string_table_mem = $10AC40
 
 ; Menu selection variables, each is one byte long
 menu_sel_vars_start = $10F9A0
-level_sel = $10F9A0
+level_sel = $10F9A0	
 loop_sel = $10F9A1
 bee_sel = $10F9A2
 shot_sel = $10F9A3
@@ -67,6 +72,19 @@ full_rank_surv_time = $0001F800
  org  0
    incbin  "build\ddonpachj.bin"
 
+ org $002628
+   jmp hijack_gameover_loop
+   
+ org $06BBCC
+   dc.b "FREE PLAY     \\      "
+
+ org $06BC0E
+   dc.b "FREE PLAY     \\      "
+
+ org $06BCA8
+   dc.b "FREE PLAY     \\      "
+ 
+
  ; Skip crc
  org $005410
   bra $00541E
@@ -100,6 +118,18 @@ full_rank_surv_time = $0001F800
 ;---------------------------------- 
  org $00552E
   jmp hijack_warning_screen
+  
+  
+ org $0045EA
+  jmp hijack_credit_decrease_1 ;while in demo. return to 45F0, use D1
+ 
+ org $004F42 
+  jmp hijack_credit_decrease_2 ;while in player select. return to 4F48, use D0
+  
+ org $004BE2
+  jmp hijack_credit_decrease_3 ;while in game. return to 4BEA, use D2
+  
+  
 
  ; Skip warning
  org $0054EC
@@ -237,6 +267,7 @@ hijack_game_start:
 
 ;---------------------------
 hijack_warning_screen:
+
   moveq #$40, D0
   movea.l #string_pos_pointer_table_mem, A0
   movea.l #string_pos_pointer_table, A1
@@ -256,14 +287,22 @@ hijack_warning_screen:
   moveq #$0, D0
   bsr draw_credit
 
-  moveq #$1, D0
-  bsr draw_credit
+;  moveq #$1, D0
+  ;bsr draw_credit
 
-  moveq #$2, D0
-  bsr draw_credit
+  ;moveq #$2, D0
+;  bsr draw_credit
 
-  moveq #$3, D0
-  bsr draw_credit
+  ;moveq #$3, D0
+  ;bsr draw_credit
+
+; set initial menu item to exit
+  move.b #$07, menu_index
+  bsr update_menu_selection
+  
+
+
+
 
 .redraw_menu
   move.w frame_counter, D0
@@ -285,8 +324,30 @@ hijack_warning_screen:
 .exit
   bsr prep_menu_results 
 
+  bsr freeplay_patch
+
   jmp $00554E
 ;---------------------------
+
+
+freeplay_patch:
+
+  move.b chute_config, D0
+  lsr.b #$04, D0
+  
+  cmpi.b #$0C, D0
+  beq .freeplay_enable
+  cmpi.b #$03, D0
+  beq .freeplay_enable
+  cmpi.b #$0F, D0
+  beq .freeplay_enable
+  rts
+  
+ .freeplay_enable:
+  
+  move.b #$09, machine_credit1  
+ 
+  rts  
 
 ;---------------------------
 prep_menu_results:
@@ -299,6 +360,7 @@ prep_menu_results:
 
 .menu_results_dont_skip
   move.b #$01, skipped_to_stage
+  move.b #$FF, level_sel ; set to FF if starting on stage 1
   
 .menu_results_check_maximum
   tst.b bonus_sel
@@ -423,12 +485,22 @@ update_menu_value:
     
     moveq #$00, D1
     move.b (A0, D0), D1 ; Get selection
+
+
+; adjust level and loop display values
+
+	cmpi.b #$02, D0
+	bcc .skip_add
+	addi.b #$01, D1
+	
+.skip_add
+
     
     rol #$4, D0 ; Get item offset into string_table_mem
     add.w D2, D0 ; Offset to value
-    
-    move.b (A1, D1), D1 ; Load char
-    move.b D1, (A2, D0)
+
+	move.b (A1, D1), D1 ; Load char
+	move.b D1, (A2, D0)
     
   rts
 ;---------------------------
@@ -564,6 +636,92 @@ copy_mem:
   rts
 ;-----------------
 
+
+.reset_to_menu
+  jmp $0052F6
+
+hijack_gameover_loop:
+
+  move.b input_p1_2, D1  ;reset if P1 Start is pressed during game over
+  cmpi.b #$7F, D1
+  beq .reset_to_menu
+
+  move.b #$00, game_start_handled  ;prepare variables
+  move.b #$00, stage_skip_count
+  move.b #$00, player_clicked_in
+  move.b #$00, maximum_applied
+   
+  move.b level_sel, D1
+  cmpi.b #$FF, D1
+  beq .skip_set_go1 ; stage select is 1st stage
+
+  ; else stage select is 1+
+  move.b #$00, skipped_to_stage
+  bra .skip_set_go2
+  
+.skip_set_go1
+
+  move.b #$01, skipped_to_stage
+  
+.skip_set_go2
+  
+  jmp $002636
+
+hijack_credit_decrease_1: ; use D1
+
+  move.b chute_config, D1
+  lsr.b #$04, D1
+  
+  cmpi.b #$0C, D1
+  beq .skip_credit_dec1
+  cmpi.b #$03, D1
+  beq .skip_credit_dec1
+  cmpi.b #$0F, D1
+  beq .skip_credit_dec1
+  
+  subq.w #$1, $1013aa.l
+  
+ .skip_credit_dec1:
+  jmp $0045F0
+ 
+hijack_credit_decrease_2: ; use D0
+
+  move.b chute_config, D0
+  lsr.b #$04, D0
+  
+  cmpi.b #$0C, D0
+  beq .skip_credit_dec2
+  cmpi.b #$03, D0
+  beq .skip_credit_dec2
+  cmpi.b #$0F, D0
+  beq .skip_credit_dec2
+  
+  sub.w D7, $1013aa.l
+
+ .skip_credit_dec2:
+  jmp $004F48
+
+hijack_credit_decrease_3: ; use D2
+
+  move.w (A1), $1013ac.l
+
+  move.b chute_config, D2
+  lsr.b #$04, D2
+  
+  cmpi.b #$0C, D2
+  beq .skip_credit_dec3
+  cmpi.b #$03, D2
+  beq .skip_credit_dec3
+  cmpi.b #$0F, D2
+  beq .skip_credit_dec3
+
+  sub.w D1, (A1)
+  
+ .skip_credit_dec3:
+  jmp $004BEA
+  
+
+
 nibble_to_char:
   dc.b "0123456789ABCDEF"
 
@@ -571,7 +729,7 @@ max_value_table:
   dc.b $06, $01, $01, $04, $06, $0F, $01, $00
 
 default_value_table:
-  dc.b $00, $00, $00, $04, $06, $0F, $00, $00
+  dc.b $00, $00, $00, $00, $03, $00, $00, $00
 
 ; Each entry 8 bytes
 ; Layout: CC CC PP PP AA AA AA AA
@@ -599,17 +757,17 @@ exit_pos_pointer:
 ; Each entry is 16 bytes long
 string_table:
 level_string:
-  dc.b "      LEVEL 0 \\\\"
+  dc.b "      LEVEL 1 \\\\"
 loop_string:
-  dc.b "       LOOP 0 \\\\"
+  dc.b "       LOOP 1 \\\\"
 bee_string:
   dc.b "   KILL BEE 0 \\\\"
 shot_string:
-  dc.b "       SHOT 4 \\\\"
+  dc.b "       SHOT 0 \\\\"
 bomb_string:
-  dc.b "       BOMB 6 \\\\"
+  dc.b "       BOMB 3 \\\\"
 bonus_string:
-  dc.b "  MAX BONUS F \\\\"  
+  dc.b "  MAX BONUS 0 \\\\"  
 rank_string:
   dc.b "   MAX RANK 0 \\\\"  
 exit_string:
@@ -618,19 +776,8 @@ exit_string:
 credits_string_pos_pointer_table:
   dc.b $C0, $00, $02, $98
   dc.l credit_1
-  dc.b $C0, $00, $02, $40
-  dc.l credit_2
-  dc.b $C0, $00, $02, $30
-  dc.l credit_3
-  dc.b $C0, $00, $02, $28
-  dc.l credit_4
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.03\\\\"
-credit_2:
-  dc.b "CREATED BY GREGO\\\\"
-credit_3:
-  dc.b "FUNDED BY\\\\"
-credit_4:
-  dc.b "    ELECTRIC UNDERGROUND\\\\"
+  dc.b "DODONPACHI TRAINER 1.06 \\\\"
+
