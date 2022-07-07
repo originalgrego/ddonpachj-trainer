@@ -1,3 +1,53 @@
+Dodonpachi Trainer v1.06 by alamone
+Latest version will be posted at http://alamone.net/
+
+This is a minor update to the v1.03 DDP trainer by Grego available at:
+https://github.com/originalgrego/ddonpachj-trainer
+
+Instructions:
+
+Apply the IPS patches to the ORIGINAL u26.bin and u27.bin roms.
+
+Original MD5: 
+u26.bin: aa78566c48732e386cc2765b34f1e5fe
+u27.bin: 5c67e9da4bee96e86628e0075e1817e6
+
+Patched MD5:
+u26.bin: 9b7138891e80f0e232298a5b40d2f397
+u27.bin: 0f9671d8f600884ee21cfa2e06a99ea1
+
+MAME: ZIP the patched u26.bin and u27.bin roms as ddonpachj.zip and place in your ROMS folder.
+      You can specify the game directly (e.g. mame ddonpachj) to ignore CRC32 check.
+
+PCB: Program the patched u26 and u27 roms onto blank ROMS and swap onto your PCB.
+
+MiSTer: Copy "DoDonPachi (Trainer v1.06).mra" to "/media/fat/_Arcade" folder
+        ZIP the patched u26.bin and u27.bin roms as "ddptr.zip"
+        Copy "ddptr.zip" into "/media/fat/games/mame" folder
+
+Compared to v1.03, the v1.06 patch does the following:
+- Applies stage and loop select for credits beyond the 1st credit.
+- Allows you to reset the game (return to the trainer menu) by pressing 1P Start during the game over screen.
+- Allows you to select "FREE PLAY" in the configuration / test menu.  FREE PLAY replaces the 3 COIN 1 CREDIT option.
+- Change display of "Stage" and "Loop" to start from 1 instead of 0.
+- Default menu options are set to standard defaults (shot 0, bomb 3, max bonus 0).
+- Cursor set to "EXIT" by default.
+
+Changelog:
+v1.06: Reduce patch size to fix compatibility issue with PCB and MiSTer.
+       Add files and instructions for MiSTer usage.
+
+v1.05: Fix bug where stage select is applied on demo play.
+       Fix bug where stage select to 1-1 and 2-1 causes 2nd+ credit to skip to 1-2 and 2-2.
+       Change display of "Stage" and "Loop" to start from 1 instead of 0.
+       Change default values to standard defaults (shot 0, bomb 3, max bonus 0).
+       Cursor set to "EXIT" by default.
+
+v1.04: Preserve stage/loop select after 2nd+ credit.
+       Reset / return to trainer menu by pressing 1P Start at game over screen.
+
+Original readme below:
+
 # ddonpachj-trainer
 
 Trainer mod for the japanese dodonpachi release.
