@@ -71,6 +71,15 @@ full_rank_surv_time = $0001F800
 
  org  0
    incbin  "build\ddonpachj.bin"
+   
+ org $00616C ;fix pause scroll clearing shot/bomb to 0/3
+  dc.b $00, $04, $00, $04, $06, $06
+ org $00640E
+  nop
+  nop
+ org $006420
+  nop
+  nop
 
  org $002628
    jmp hijack_gameover_loop
@@ -160,7 +169,8 @@ full_rank_surv_time = $0001F800
 ;============================
 ; Free space
 ;============================
- org $098000
+ ;org $098000
+ org $097c00
 
 ;---------------------------
 hijack_player_weapon_select:
@@ -287,14 +297,14 @@ hijack_warning_screen:
   moveq #$0, D0
   bsr draw_credit
 
-;  moveq #$1, D0
-  ;bsr draw_credit
+  moveq #$1, D0
+  bsr draw_credit
 
-  ;moveq #$2, D0
-;  bsr draw_credit
+  moveq #$2, D0
+  bsr draw_credit
 
-  ;moveq #$3, D0
-  ;bsr draw_credit
+  moveq #$3, D0
+  bsr draw_credit
 
 ; set initial menu item to exit
   move.b #$07, menu_index
@@ -721,6 +731,25 @@ hijack_credit_decrease_3: ; use D2
   jmp $004BEA
   
 
+;hijack_memory_clear_scroll:
+;
+;.memory_clear_1:
+;
+  ;clr.w (A0)+
+  ;cmpa.l #$102CAC, A0
+  ;bne .memory_clear_1
+;
+  ;lea $102CB2.l, A0
+;
+;.memory_clear_2:
+;
+  ;clr.w (A0)+
+  ;cmpa.l #$10e878, A0
+  ;bne .memory_clear_2
+;
+  ;jmp $00390C
+
+
 
 nibble_to_char:
   dc.b "0123456789ABCDEF"
@@ -776,8 +805,19 @@ exit_string:
 credits_string_pos_pointer_table:
   dc.b $C0, $00, $02, $98
   dc.l credit_1
+  dc.b $C0, $00, $02, $40
+  dc.l credit_2
+  dc.b $C0, $00, $02, $30
+  dc.l credit_3
+  dc.b $C0, $00, $02, $28
+  dc.l credit_4
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.06 \\\\"
-
+  dc.b "DODONPACHI TRAINER 1.07\\\\"
+credit_2:
+  dc.b "REVISED BY ALAMONE.\\\\"
+credit_3:
+  dc.b "ORIGINAL BY GREGO. FUNDED\\\\"
+credit_4:
+  dc.b "BY ELECTRIC UNDERGROUND\\\\"
