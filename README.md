@@ -1,4 +1,4 @@
-Dodonpachi Trainer v1.07 by alamone
+Dodonpachi Trainer v1.08 by alamone
 Latest version will be posted at http://alamone.net/
 
 This is a minor update to the v1.03 DDP trainer by Grego available at:
@@ -13,19 +13,19 @@ u26.bin: aa78566c48732e386cc2765b34f1e5fe
 u27.bin: 5c67e9da4bee96e86628e0075e1817e6
 
 Patched MD5:
-u26.bin: 7fef56bea33c1ddddd08c23b66313b12
-u27.bin: 8f023c01ac718ee9b925eb57d9522e42
+u26.bin: 213ab52ad1cb2f2497f79f11cd71be89
+u27.bin: cfef73b172b57f5ffadb8843ec87dddf
 
 MAME: ZIP the patched u26.bin and u27.bin roms as ddonpachj.zip and place in your ROMS folder.
       You can specify the game directly (e.g. mame ddonpachj) to ignore CRC32 check.
 
 PCB: Program the patched u26 and u27 roms onto blank ROMS and swap onto your PCB.
 
-MiSTer: Copy "DoDonPachi (Trainer v1.07).mra" to "/media/fat/_Arcade" folder
+MiSTer: Copy "DoDonPachi (Trainer v1.08).mra" to "/media/fat/_Arcade" folder
         ZIP the patched u26.bin and u27.bin roms as "ddptr.zip"
         Copy "ddptr.zip" into "/media/fat/games/mame" folder
 
-Compared to v1.03, the v1.07 patch does the following:
+Compared to v1.03, the v1.08 patch does the following:
 - Applies stage and loop select for credits beyond the 1st credit.
 - Allows you to reset the game (return to the trainer menu) by pressing 1P Start during the game over screen.
 - Allows you to select "FREE PLAY" in the configuration / test menu.  FREE PLAY replaces the 3 COIN 1 CREDIT option.
@@ -33,8 +33,13 @@ Compared to v1.03, the v1.07 patch does the following:
 - Default menu options are set to standard defaults (shot 0, bomb 3, max bonus 0).
 - Cursor set to "EXIT" by default.
 - Using stage scroll (C+up/down while in pause - 2P Start) now sets shot power=4, bomb=6. Originally power=0, bomb=3.
+- Fix graphical bug (blank frame) when selecting Loop 2 Stage 1.
+- Fix bugs related to playing on 2P side.
 
 Changelog:
+v1.08: Released 7/17/2022:
+       Bugfix.
+
 v1.07: Released 7/7/2022:
        Relocate patch code offset and restore credit screen.
        Using stage scroll (C+up/down while in pause - 2P Start) now sets shot power=4, bomb=6.
@@ -53,6 +58,7 @@ v1.05: Released 7/4/2022:
 v1.04: Released 7/2/2022:
        Preserve stage/loop select after 2nd+ credit.
        Reset / return to trainer menu by pressing 1P Start at game over screen.
+
 
 Original readme below:
 

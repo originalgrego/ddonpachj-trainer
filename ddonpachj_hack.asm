@@ -1,5 +1,5 @@
-; up to offset 98562
-
+lives_1p = $101965
+lives_2p = $101967
 machine_credit1 = $1013AB
 chute_config = $101297
 input_p1 = $d00000
@@ -12,12 +12,21 @@ shot_power = $102CAD
 laser_power = $102CAF
 bomb_count = $102CB0
 bomb_max = $102CB1
+shot_power_2p = $102CED
+laser_power_2p = $102CEF
+bomb_count_2p = $102CF0
+bomb_max_2p = $102CF1
 rank = $101968
 survival_time = $101970
 
 max_bonus = $10192a
 max_bonus_2 = $10192c
 max_bonus_3 = $101924
+
+max_bonus_2P = $101934
+max_bonus_2_2P = $101936
+max_bonus_3_2P = $10192E
+
 
 ; free_mem = $10AC00
 menu_index = $10AC00
@@ -36,6 +45,7 @@ shot_sel = $10F9A3
 bomb_sel = $10F9A4
 bonus_sel = $10F9A5
 rank_sel = $10F9A6
+in_pause = $10F9A7
 
 skipped_to_stage = $10f900
 stage_skip_count = $10f904
@@ -72,15 +82,12 @@ full_rank_surv_time = $0001F800
  org  0
    incbin  "build\ddonpachj.bin"
    
- org $00616C ;fix pause scroll clearing shot/bomb to 0/3
-  dc.b $00, $04, $00, $04, $06, $06
- org $00640E
-  nop
-  nop
- org $006420
-  nop
-  nop
+ org $000B6C ;fix pause scroll clearing shot/bomb to 0/3
+   jmp hijack_pause_scroll_return
 
+ org $00616C ;defaults
+   dc.b $00, $04, $00, $04, $06, $06
+ 
  org $002628
    jmp hijack_gameover_loop
    
@@ -92,7 +99,6 @@ full_rank_surv_time = $0001F800
 
  org $06BCA8
    dc.b "FREE PLAY     \\      "
- 
 
  ; Skip crc
  org $005410
@@ -128,7 +134,6 @@ full_rank_surv_time = $0001F800
  org $00552E
   jmp hijack_warning_screen
   
-  
  org $0045EA
   jmp hijack_credit_decrease_1 ;while in demo. return to 45F0, use D1
  
@@ -138,8 +143,6 @@ full_rank_surv_time = $0001F800
  org $004BE2
   jmp hijack_credit_decrease_3 ;while in game. return to 4BEA, use D2
   
-  
-
  ; Skip warning
  org $0054EC
  ; bra $00554e
@@ -165,6 +168,18 @@ full_rank_surv_time = $0001F800
   
  org $04781C
   jmp hijack_player_weapon_select
+  
+ org $046D4C
+  jmp hijack_player_weapon_select_2P
+  
+; org $0045A0
+;  jmp hijack_player_weapon_select_entry
+
+ org $04CC8C
+  jmp hijack_2nd_loop_test
+  
+ org $000B56
+  jmp hijack_pause_loop
 
 ;============================
 ; Free space
@@ -183,6 +198,19 @@ hijack_player_weapon_select:
   
   jmp $047830
 ;---------------------------
+
+;---------------------------
+hijack_player_weapon_select_2P:
+  moveq #$01, D0
+  move.b D0, player_clicked_in
+
+  move.b  #$20, ($72,A6)
+  move.b  #$0, ($73,A6)
+  andi.b  #$fb, $102d09.l
+  
+  jmp $046d60
+;---------------------------
+
   
 ;---------------------------
 kill_big_bee:
@@ -199,6 +227,9 @@ kill_big_bee:
 
 ;---------------------------
 hijack_game_start:
+
+  ;jsr $58f0c.l; ;draw frame?
+  
   move.b game_start_handled, D5
   bne .game_start_exit
   
@@ -215,6 +246,9 @@ hijack_game_start:
       move.b #$01, maximum_applied
 
       movem.l D0-D7/A0-A1, -(A7)
+	
+      tst.b lives_1p
+	  beq .max_apply_2p 
 
       moveq #$00, D0
       move.b bonus_sel, D0
@@ -235,9 +269,40 @@ hijack_game_start:
       move.w  max_bonus_3, D0
       jsr     $576b6.l ; Update score?
 
-      move.l  D2, $101926.l
+      ;move.l  D2, $101926.l
   
       jsr $59090 ; Call maximum prep method
+
+.max_apply_2p
+
+      tst.b lives_2p
+	  beq .max_apply_finish
+	  
+      moveq #$00, D0
+      move.b bonus_sel, D0
+            
+      move.w D0, max_bonus_2P
+      move.w D0, max_bonus_2_2P
+
+      subi #$01, D0
+     
+      moveq #$00, D1
+      
+.bonus_loop_2P
+      addi #$16, D1 
+      dbra D0, .bonus_loop_2P
+      
+      move.w D1, max_bonus_3_2P
+      
+      move.w  max_bonus_3_2P, D0
+      jsr     $576b6.l ; Update score?
+
+      ;move.l  D2, $101926.l
+  
+      jsr $590B4 ; Call maximum prep method
+
+.max_apply_finish
+
       movem.l (A7)+, D0-D7/A0-A1
 
 .check_skip
@@ -250,6 +315,7 @@ hijack_game_start:
   bra .game_start_check_handled
     
 .do_skip
+
   tst.b skipped_to_stage
   bne .game_start_check_handled
 
@@ -271,7 +337,9 @@ hijack_game_start:
   move.b #$01, game_start_handled
 
 .game_start_exit
+
   jsr $57dae.l
+
   jmp $48626
 ;---------------------------
 
@@ -361,6 +429,14 @@ freeplay_patch:
 
 ;---------------------------
 prep_menu_results:
+  
+  move.b bonus_sel, D0
+  cmpi.b #$01, D0
+  bne .menu_results_dont_incr_bonus
+  move.b #$02, bonus_sel
+  
+.menu_results_dont_incr_bonus
+
   move.b level_sel, D0
   beq .menu_results_dont_skip
 
@@ -577,20 +653,21 @@ hijack_initialize_player_shot:
   move.l  (A2,D0.w), (A4) 
   move.l  (A3,D0.w), ($4,A4) 
   
-  move.b game_start_handled, D0
-  bne .init_p_shot_continue
+;  move.b game_start_handled, D0
+;  bne .init_p_shot_continue
 
-
-  move.b player_clicked_in, D0
-  beq .init_p_shot_continue  
+;  move.b player_clicked_in, D0
+;  beq .init_p_shot_continue  
 
 ;  moveq #$01, D0
 ;  move.b D0, invincible ; Make invincible
 
   moveq #$00, D0
   move.b shot_sel, D0
-  move.b D0, shot_power
-  move.b D0, laser_power
+  ;move.b D0, shot_power
+  ;move.b D0, laser_power
+  move.b D0, ($21, A6)
+  move.b D0, ($23, A6)
 
   rol.b #$1, D0
 
@@ -610,7 +687,8 @@ hijack_initialize_player:
   dbra    D5, .loop
 
   move.b game_start_handled, D5
-  bne .init_player_exit
+  ;bne .init_player_exit
+  bne .rank_not_selected
 
   moveq #$00, D5
   move.b loop_sel, D5
@@ -622,17 +700,31 @@ hijack_initialize_player:
   move.l #full_rank_surv_time, D5
   move.l D5, survival_time
 
+
 .rank_not_selected
   move.b bomb_sel, D5
-  move.b D5, bomb_count
+  ;move.b D5, bomb_count
+  move.b D5, (-$1A, A1)
 
   cmpi.b #$03, D5
   bge .init_player_continue
 
   move.b #$03, D5
+  tst.b bonus_sel
+  beq .init_player_continue
+  
+  move.b D5, (-$1A, A1) ; set bomb to 3 if bonus > 0
 
 .init_player_continue  
-  move.b D5, bomb_max
+  ;move.b D5, bomb_max
+  move.b D5, (-$19, A1)
+  
+  tst.b in_pause
+  beq .init_player_exit
+  
+  move.b #$06, D5  ; set bomb to 6 if in pause
+  move.b D5, (-$1A, A1)
+  move.b D5, (-$19, A1)  
   
 .init_player_exit
   jmp $0063F0
@@ -660,6 +752,7 @@ hijack_gameover_loop:
   move.b #$00, stage_skip_count
   move.b #$00, player_clicked_in
   move.b #$00, maximum_applied
+  jsr .menu_results_check_maximum
    
   move.b level_sel, D1
   cmpi.b #$FF, D1
@@ -730,32 +823,78 @@ hijack_credit_decrease_3: ; use D2
  .skip_credit_dec3:
   jmp $004BEA
   
+  
+hijack_pause_scroll_return:
 
-;hijack_memory_clear_scroll:
-;
-;.memory_clear_1:
-;
-  ;clr.w (A0)+
-  ;cmpa.l #$102CAC, A0
-  ;bne .memory_clear_1
-;
-  ;lea $102CB2.l, A0
-;
-;.memory_clear_2:
-;
-  ;clr.w (A0)+
-  ;cmpa.l #$10e878, A0
-  ;bne .memory_clear_2
-;
-  ;jmp $00390C
+  move.b player_clicked_in, D0
+  cmpi.b #$01, D0
+  beq .max_shot_bomb_after_scroll
+  bra .return_pause_scroll
+  
+ .max_shot_bomb_after_scroll:
+  
+  move.b lives_1p, D0
+  cmpi.b #$00, D0
+  beq .check_2p_lives
+
+  moveq #$00, D0
+  move.b #$04, D0
+  move.b D0, shot_power
+  move.b D0, laser_power
+  move.b #$06, D0
+  move.b D0, bomb_count
+  move.b D0, bomb_max
+    
+ .check_2p_lives:
+ 
+  move.b lives_2p, D0
+  cmpi.b #$00, D0
+  beq .return_pause_scroll
+
+  moveq #$00, D0
+  move.b #$04, D0
+  move.b D0, shot_power_2p
+  move.b D0, laser_power_2p
+  move.b #$06, D0
+  move.b D0, bomb_count_2p
+  move.b D0, bomb_max_2p
+  
+ .return_pause_scroll:
 
 
+;  move.w #$01, $10e862.l
+;  jsr $570d4.l ;update bomb?
+;  jsr $58F0C.l ;update bomb?
 
+  move.b #$00, in_pause
+  jmp $000B1E  
+
+
+hijack_player_weapon_select_entry:
+  moveq #$00, D1
+  cmpi.w #$1, D7
+  jmp $0045A6
+
+hijack_2nd_loop_test:
+  tst.b loop_sel
+  beq .second_loop_continue
+  ; second loop set
+  jmp $4cc94
+
+.second_loop_continue:   
+  tst.w $10197a.l
+  jmp $4cc92
+
+hijack_pause_loop:
+  move.b #$01, in_pause
+  move.w #$01, $100F48.l
+  jmp $b5e
+  
 nibble_to_char:
   dc.b "0123456789ABCDEF"
 
 max_value_table:
-  dc.b $06, $01, $01, $04, $06, $0F, $01, $00
+  dc.b $06, $01, $01, $04, $06, $09, $01, $00
 
 default_value_table:
   dc.b $00, $00, $00, $00, $03, $00, $00, $00
@@ -814,7 +953,7 @@ credits_string_pos_pointer_table:
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.07\\\\"
+  dc.b "DODONPACHI TRAINER 1.08\\\\"
 credit_2:
   dc.b "REVISED BY ALAMONE.\\\\"
 credit_3:
