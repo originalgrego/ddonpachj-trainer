@@ -1,4 +1,4 @@
-Dodonpachi Trainer v1.08 by alamone
+Dodonpachi Trainer v1.09 by alamone
 Latest version will be posted at http://alamone.net/
 
 This is a minor update to the v1.03 DDP trainer by Grego available at:
@@ -13,19 +13,19 @@ u26.bin: aa78566c48732e386cc2765b34f1e5fe
 u27.bin: 5c67e9da4bee96e86628e0075e1817e6
 
 Patched MD5:
-u26.bin: 213ab52ad1cb2f2497f79f11cd71be89
-u27.bin: cfef73b172b57f5ffadb8843ec87dddf
+u26.bin: 5a037c7ea06e71f30341ab661307f7b8
+u27.bin: 6053ff44f2e868106b2e7e1da7f56541
 
 MAME: ZIP the patched u26.bin and u27.bin roms as ddonpachj.zip and place in your ROMS folder.
       You can specify the game directly (e.g. mame ddonpachj) to ignore CRC32 check.
 
 PCB: Program the patched u26 and u27 roms onto blank ROMS and swap onto your PCB.
 
-MiSTer: Copy "DoDonPachi (Trainer v1.08).mra" to "/media/fat/_Arcade" folder
+MiSTer: Copy "DoDonPachi (Trainer v1.09).mra" to "/media/fat/_Arcade" folder
         ZIP the patched u26.bin and u27.bin roms as "ddptr.zip"
         Copy "ddptr.zip" into "/media/fat/games/mame" folder
 
-Compared to v1.03, the v1.08 patch does the following:
+Compared to v1.03, the v1.09 patch does the following:
 - Applies stage and loop select for credits beyond the 1st credit.
 - Allows you to reset the game (return to the trainer menu) by pressing 1P Start during the game over screen.
 - Allows you to select "FREE PLAY" in the configuration / test menu.  FREE PLAY replaces the 3 COIN 1 CREDIT option.
@@ -35,8 +35,12 @@ Compared to v1.03, the v1.08 patch does the following:
 - Using stage scroll (C+up/down while in pause - 2P Start) now sets shot power=4, bomb=6. Originally power=0, bomb=3.
 - Fix graphical bug (blank frame) when selecting Loop 2 Stage 1.
 - Fix bugs related to playing on 2P side.
+- Speed up "shinu ga yoi" text if starting on 2-7.
 
 Changelog:
+v1.09: Released 7/17/2022:
+       Add "shinu ga yoi" text speedup feature.
+
 v1.08: Released 7/17/2022:
        Bugfix.
 

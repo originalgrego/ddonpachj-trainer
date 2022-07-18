@@ -181,6 +181,11 @@ full_rank_surv_time = $0001F800
  org $000B56
   jmp hijack_pause_loop
 
+ org $009E9A
+  jmp shinugayoi
+ 
+
+
 ;============================
 ; Free space
 ;============================
@@ -861,19 +866,13 @@ hijack_pause_scroll_return:
   
  .return_pause_scroll:
 
-
-;  move.w #$01, $10e862.l
-;  jsr $570d4.l ;update bomb?
-;  jsr $58F0C.l ;update bomb?
-
   move.b #$00, in_pause
   jmp $000B1E  
 
-
-hijack_player_weapon_select_entry:
-  moveq #$00, D1
-  cmpi.w #$1, D7
-  jmp $0045A6
+;hijack_player_weapon_select_entry:
+  ;moveq #$00, D1
+  ;cmpi.w #$1, D7
+  ;jmp $0045A6
 
 hijack_2nd_loop_test:
   tst.b loop_sel
@@ -889,6 +888,25 @@ hijack_pause_loop:
   move.b #$01, in_pause
   move.w #$01, $100F48.l
   jmp $b5e
+
+shinugayoi:
+  tst.b loop_sel
+  beq .normal_shinugayoi ; selected first loop
+  
+  move.b level_sel, D0
+  cmpi #$05, D0
+  bne .normal_shinugayoi ; selected level other than 6
+
+.fast_shinugayoi
+  move.l #fast_shinugayoi_table, D0
+  bra .shinugayoi_end
+
+.normal_shinugayoi
+  move.l #$9fa0, D0
+
+.shinugayoi_end
+  move.l D0, ($6, A6)
+  jmp $9ea2
   
 nibble_to_char:
   dc.b "0123456789ABCDEF"
@@ -953,10 +971,24 @@ credits_string_pos_pointer_table:
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.08\\\\"
+  dc.b "DODONPACHI TRAINER 1.09\\\\"
 credit_2:
   dc.b "REVISED BY ALAMONE.\\\\"
 credit_3:
   dc.b "ORIGINAL BY GREGO. FUNDED\\\\"
 credit_4:
   dc.b "BY ELECTRIC UNDERGROUND\\\\"
+
+fast_shinugayoi_table:
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
+  dc.w $0001, $0001, $0001, $FFFF, $0001
+  
