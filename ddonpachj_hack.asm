@@ -183,7 +183,18 @@ full_rank_surv_time = $0001F800
 
  org $009E9A
   jmp shinugayoi
- 
+
+ org $0400B6
+  jmp taisa_skip
+
+ org $0400AA
+  jmp taisa_skip_2
+
+ org $0401BA
+  jmp credit_skip
+  
+ org $040252
+  jmp credit_skip_2
 
 
 ;============================
@@ -274,9 +285,9 @@ hijack_game_start:
       move.w  max_bonus_3, D0
       jsr     $576b6.l ; Update score?
 
-      ;move.l  D2, $101926.l
+      move.l  D2, $101926.l
   
-      jsr $59090 ; Call maximum prep method
+      jsr $59090 ; Call maximum prep method 1P
 
 .max_apply_2p
 
@@ -302,9 +313,9 @@ hijack_game_start:
       move.w  max_bonus_3_2P, D0
       jsr     $576b6.l ; Update score?
 
-      ;move.l  D2, $101926.l
+      move.l  D2, $101930.l
   
-      jsr $590B4 ; Call maximum prep method
+      jsr $590B4 ; Call maximum prep method 2P
 
 .max_apply_finish
 
@@ -434,13 +445,6 @@ freeplay_patch:
 
 ;---------------------------
 prep_menu_results:
-  
-  move.b bonus_sel, D0
-  cmpi.b #$01, D0
-  bne .menu_results_dont_incr_bonus
-  move.b #$02, bonus_sel
-  
-.menu_results_dont_incr_bonus
 
   move.b level_sel, D0
   beq .menu_results_dont_skip
@@ -507,6 +511,11 @@ handle_menu_inputs:
 .input_check_left
   btst #b_input_left, D1
   beq .input_check_right
+
+  move.b menu_index, D0 ; skip left and right if cursor on "exit"
+  cmpi.b #menu_max_index, D0
+  beq .input_check_right
+  
   
     moveq #$00, D0
     move.b menu_index, D0
@@ -528,6 +537,10 @@ handle_menu_inputs:
 
 .input_check_right
   btst #b_input_right, D1
+  beq .input_check_button
+  
+  move.b menu_index, D0 ; skip left and right if cursor on "exit"
+  cmpi.b #menu_max_index, D0
   beq .input_check_button
 
     moveq #$00, D0
@@ -907,12 +920,72 @@ shinugayoi:
 .shinugayoi_end
   move.l D0, ($6, A6)
   jmp $9ea2
+
+taisa_skip:
+  move.b input_p1_2, D6
+  cmpi.b #$FF, D6
+  beq .taisa_no_input
   
+  move.w  #$01, D0
+
+.taisa_no_input:  
+  move.w  D0, ($0,A6)
+  move.l  A2, ($6,A6)
+
+  jmp $400BE
+
+taisa_skip_2:
+
+  move.w  (A2), ($0,A6)
+  move.w  #$1, ($e,A6)
+
+  move.b input_p1_2, D6
+  cmpi.b #$FF, D6
+  beq .taisa_2_no_input
+  
+  move.w  #$01, ($0,A6)
+
+.taisa_2_no_input:  
+  jmp $400B4
+
+credit_skip:
+
+  move.w  #$f0, D1
+
+  move.b input_p1_2, D0
+  cmpi.b #$FF, D0
+  beq .credit_no_input
+  
+  move.w  #$02, D1
+  
+.credit_no_input:  
+
+  move.w  D1, ($2c,A6)
+  jmp $401C0
+
+credit_skip_2:
+
+  move.w  #$80, D1
+
+  move.b input_p1_2, D0
+  cmpi.b #$FF, D0
+  beq .credit_2_no_input
+  
+  move.w  #$01, D1
+  
+.credit_2_no_input:  
+
+  move.w  D1, ($34,A6)
+  
+  jmp $40258
+  
+  
+
 nibble_to_char:
   dc.b "0123456789ABCDEF"
 
 max_value_table:
-  dc.b $06, $01, $01, $04, $06, $09, $01, $00
+  dc.b $06, $01, $01, $04, $06, $0F, $01, $00
 
 default_value_table:
   dc.b $00, $00, $00, $00, $03, $00, $00, $00
@@ -971,9 +1044,9 @@ credits_string_pos_pointer_table:
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER 1.09\\\\"
+  dc.b "DODONPACHI TRAINER V1.10\\\\"
 credit_2:
-  dc.b "REVISED BY ALAMONE.\\\\"
+  dc.b "REVISED BY ALAMONE. \\\\"
 credit_3:
   dc.b "ORIGINAL BY GREGO. FUNDED\\\\"
 credit_4:

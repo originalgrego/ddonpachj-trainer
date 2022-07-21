@@ -1,4 +1,4 @@
-Dodonpachi Trainer v1.09 by alamone
+Dodonpachi Trainer v1.10 by alamone
 Latest version will be posted at http://alamone.net/
 
 This is a minor update to the v1.03 DDP trainer by Grego available at:
@@ -13,19 +13,19 @@ u26.bin: aa78566c48732e386cc2765b34f1e5fe
 u27.bin: 5c67e9da4bee96e86628e0075e1817e6
 
 Patched MD5:
-u26.bin: 5a037c7ea06e71f30341ab661307f7b8
-u27.bin: 6053ff44f2e868106b2e7e1da7f56541
+u26.bin: 1813af29ab8a8de39fe58f80d96ecdc1
+u27.bin: 7e852eaa71c687c39963849b0f8984d5
 
 MAME: ZIP the patched u26.bin and u27.bin roms as ddonpachj.zip and place in your ROMS folder.
       You can specify the game directly (e.g. mame ddonpachj) to ignore CRC32 check.
 
 PCB: Program the patched u26 and u27 roms onto blank ROMS and swap onto your PCB.
 
-MiSTer: Copy "DoDonPachi (Trainer v1.09).mra" to "/media/fat/_Arcade" folder
+MiSTer: Copy "DoDonPachi (Trainer v1.10).mra" to "/media/fat/_Arcade" folder
         ZIP the patched u26.bin and u27.bin roms as "ddptr.zip"
         Copy "ddptr.zip" into "/media/fat/games/mame" folder
 
-Compared to v1.03, the v1.09 patch does the following:
+Compared to v1.03, the v1.10 patch does the following:
 - Applies stage and loop select for credits beyond the 1st credit.
 - Allows you to reset the game (return to the trainer menu) by pressing 1P Start during the game over screen.
 - Allows you to select "FREE PLAY" in the configuration / test menu.  FREE PLAY replaces the 3 COIN 1 CREDIT option.
@@ -36,8 +36,14 @@ Compared to v1.03, the v1.09 patch does the following:
 - Fix graphical bug (blank frame) when selecting Loop 2 Stage 1.
 - Fix bugs related to playing on 2P side.
 - Speed up "shinu ga yoi" text if starting on 2-7.
+- Speed up text on 1st and 2nd loop endings and end credits (hold any button on 1P side).
 
 Changelog:
+v1.10: Released 7/21/2022:
+       Add first and second loop ending text and ending credits speedup feature (hold any button on 1P side).
+       Fix bug incorrectly setting max bonus.
+       Fix bug allowing value to be changed for "EXIT" menu item.
+
 v1.09: Released 7/17/2022:
        Add "shinu ga yoi" text speedup feature.
 
