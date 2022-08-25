@@ -181,8 +181,8 @@ full_rank_surv_time = $0001F800
  org $000B56
   jmp hijack_pause_loop
 
- org $009E9A
-  jmp shinugayoi
+ org $009F4A
+  jmp shinugayoi_skip
 
  org $0400B6
   jmp taisa_skip
@@ -902,24 +902,17 @@ hijack_pause_loop:
   move.w #$01, $100F48.l
   jmp $b5e
 
-shinugayoi:
-  tst.b loop_sel
-  beq .normal_shinugayoi ; selected first loop
+shinugayoi_skip: ; D0 contains delay
+  move.b input_p1_2, D6
+  cmpi.b #$FF, D6
+  beq .shinugayoi_no_input
   
-  move.b level_sel, D0
-  cmpi #$05, D0
-  bne .normal_shinugayoi ; selected level other than 6
+  move.w  #$01, D0
 
-.fast_shinugayoi
-  move.l #fast_shinugayoi_table, D0
-  bra .shinugayoi_end
-
-.normal_shinugayoi
-  move.l #$9fa0, D0
-
-.shinugayoi_end
-  move.l D0, ($6, A6)
-  jmp $9ea2
+.shinugayoi_no_input:  
+  move.w D0, ($0, A6)
+  move.l A2, ($6, A6)
+  jmp $9F52
 
 taisa_skip:
   move.b input_p1_2, D6
@@ -1044,7 +1037,7 @@ credits_string_pos_pointer_table:
 
 credits_string_table:
 credit_1:
-  dc.b "DODONPACHI TRAINER V1.10\\\\"
+  dc.b "DODONPACHI TRAINER V1.11\\\\"
 credit_2:
   dc.b "REVISED BY ALAMONE. \\\\"
 credit_3:
@@ -1052,16 +1045,3 @@ credit_3:
 credit_4:
   dc.b "BY ELECTRIC UNDERGROUND\\\\"
 
-fast_shinugayoi_table:
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-  dc.w $0001, $0001, $0001, $FFFF, $0001
-  
