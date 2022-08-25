@@ -21,7 +21,7 @@ MAME: ZIP the patched u26.bin and u27.bin roms as ddonpachj.zip and place in you
 
 PCB: Program the patched u26 and u27 roms onto blank ROMS and swap onto your PCB.
 
-MiSTer: Copy "DoDonPachi (Trainer v1.10).mra" to "/media/fat/_Arcade" folder
+MiSTer: Copy "DoDonPachi (Trainer v1.11).mra" to "/media/fat/_Arcade" folder
         ZIP the patched u26.bin and u27.bin roms as "ddptr.zip"
         Copy "ddptr.zip" into "/media/fat/games/mame" folder
 
