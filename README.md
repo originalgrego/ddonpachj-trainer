@@ -1,8 +1,4 @@
-Dodonpachi Trainer v1.11 by alamone
-Latest version will be posted at http://alamone.net/
-
-This is a minor update to the v1.03 DDP trainer by Grego available at:
-https://github.com/originalgrego/ddonpachj-trainer
+Dodonpachi Trainer v1.11 by Grego and alamone
 
 Instructions:
 
