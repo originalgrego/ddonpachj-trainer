@@ -1,3 +1,80 @@
+Dodonpachi Trainer v1.11 by alamone
+Latest version will be posted at http://alamone.net/
+
+This is a minor update to the v1.03 DDP trainer by Grego available at:
+https://github.com/originalgrego/ddonpachj-trainer
+
+Instructions:
+
+Apply the IPS patches to the ORIGINAL u26.bin and u27.bin roms.
+
+Original MD5: 
+u26.bin: aa78566c48732e386cc2765b34f1e5fe
+u27.bin: 5c67e9da4bee96e86628e0075e1817e6
+
+Patched MD5:
+u26.bin: bb61f462730a9cede6124ec9866d684c
+u27.bin: 232b515839842cf9692785c153c59740
+
+MAME: ZIP the patched u26.bin and u27.bin roms as ddonpachj.zip and place in your ROMS folder.
+      You can specify the game directly (e.g. mame ddonpachj) to ignore CRC32 check.
+
+PCB: Program the patched u26 and u27 roms onto blank ROMS and swap onto your PCB.
+
+MiSTer: Copy "DoDonPachi (Trainer v1.11).mra" to "/media/fat/_Arcade" folder
+        ZIP the patched u26.bin and u27.bin roms as "ddptr.zip"
+        Copy "ddptr.zip" into "/media/fat/games/mame" folder
+
+Compared to v1.03, the v1.11 patch does the following:
+- Applies stage and loop select for credits beyond the 1st credit.
+- Allows you to reset the game (return to the trainer menu) by pressing 1P Start during the game over screen.
+- Allows you to select "FREE PLAY" in the configuration / test menu.  FREE PLAY replaces the 3 COIN 1 CREDIT option.
+- Change display of "Stage" and "Loop" to start from 1 instead of 0.
+- Default menu options are set to standard defaults (shot 0, bomb 3, max bonus 0).
+- Cursor set to "EXIT" by default.
+- Using stage scroll (C+up/down while in pause - 2P Start) now sets shot power=4, bomb=6. Originally power=0, bomb=3.
+- Fix graphical bug (blank frame) when selecting Loop 2 Stage 1.
+- Fix bugs related to playing on 2P side.
+- Speed up text on 1st and 2nd loop endings, "shinu ga yoi" text, and end credits (hold any button on 1P side).
+
+Changelog:
+v1.11: Released 8/24/2022:
+       Fixed MiSTer mra file to fix audio issue.
+       Changed "shinu ga yoi" speed up to use buttons instead.
+
+v1.10: Released 7/21/2022:
+       Add first and second loop ending text and ending credits speedup feature (hold any button on 1P side).
+       Fix bug incorrectly setting max bonus.
+       Fix bug allowing value to be changed for "EXIT" menu item.
+
+v1.09: Released 7/17/2022:
+       Add "shinu ga yoi" text speedup feature.
+
+v1.08: Released 7/17/2022:
+       Bugfix.
+
+v1.07: Released 7/7/2022:
+       Relocate patch code offset and restore credit screen.
+       Using stage scroll (C+up/down while in pause - 2P Start) now sets shot power=4, bomb=6.
+
+v1.06: Released 7/6/2022:
+       Reduce patch size to fix compatibility issue with PCB and MiSTer.
+       Add files and instructions for MiSTer usage.
+
+v1.05: Released 7/4/2022:
+       Fix bug where stage select is applied on demo play.
+       Fix bug where stage select to 1-1 and 2-1 causes 2nd+ credit to skip to 1-2 and 2-2.
+       Change display of "Stage" and "Loop" to start from 1 instead of 0.
+       Change default values to standard defaults (shot 0, bomb 3, max bonus 0).
+       Cursor set to "EXIT" by default.
+
+v1.04: Released 7/2/2022:
+       Preserve stage/loop select after 2nd+ credit.
+       Reset / return to trainer menu by pressing 1P Start at game over screen.
+
+
+Original readme below:
+
 # ddonpachj-trainer
 
 Trainer mod for the japanese dodonpachi release.

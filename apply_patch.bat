@@ -1,4 +1,9 @@
-SET ROM_DIR=C:\Users\grego\Desktop\MAME\roms
+SET ROM_DIR=roms
+
+rem assumes build\ includes ddonpachj.bin created from u27.bin + u26.bin interleaved
+rem use "combine-roms u27.bin u26.bin ddonpachj.bin" to create
+
+mkdir build\out
 
 del build\ddonpachj_hack.bin
 copy build\ddonpachj.bin build\ddonpachj_hack.bin
